@@ -1,5 +1,6 @@
 """Explicit runtime control boundary, independent of installer filesystem access."""
 
+import asyncio
 import json
 import time
 import urllib.error
@@ -72,6 +73,60 @@ class SupervisorLifecycle:
             config["version"], config["state"] == "RUNNING", supervisor["healthy"], visible,
             {item["entry_id"]: item["state"] for item in entries},
         )
+
+    def registry_view(self):
+        """Read supported live HA registries; disk may lag scheduled Store writes."""
+        async def read():
+            import aiohttp
+            url = self._ha_url.replace('http://', 'ws://', 1).replace('https://', 'wss://', 1) + '/api/websocket'
+            trace = aiohttp.TraceConfig()
+            async def refuse_redirect(*args):
+                raise InstallerError('AUTHENTICATED_REDIRECT_REFUSED')
+            trace.on_request_redirect.append(refuse_redirect)
+            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30), trace_configs=[trace]) as session:
+                async with session.ws_connect(url) as ws:
+                    await ws.receive_json()
+                    await ws.send_json({'type': 'auth', 'access_token': self._ha_token})
+                    if (await ws.receive_json()).get('type') != 'auth_ok':
+                        raise InstallerError('HA_REGISTRY_AUTH_FAILED')
+                    result = {}
+                    for identifier, (key, command) in enumerate([
+                        ('entities', 'config/entity_registry/list'), ('devices', 'config/device_registry/list')
+                    ], 1):
+                        await ws.send_json({'id': identifier, 'type': command})
+                        while True:
+                            response = await ws.receive_json()
+                            if response.get('id') == identifier:
+                                if not response.get('success'):
+                                    raise InstallerError('HA_REGISTRY_READ_FAILED')
+                                result[key] = response['result']
+                                break
+                    # list is intentionally partial (e.g. aliases omitted). Use the
+                    # supported detailed batch API for this integration's rows.
+                    entity_ids = [r['entity_id'] for r in result['entities'] if r.get('platform') == 'nexhome']
+                    if len(entity_ids) > 4096:
+                        raise InstallerError('REGISTRY_TOO_LARGE')
+                    if entity_ids:
+                        await ws.send_json({'id': 3, 'type': 'config/entity_registry/get_entries',
+                                            'entity_ids': entity_ids})
+                        while True:
+                            response = await ws.receive_json()
+                            if response.get('id') == 3:
+                                if not response.get('success'):
+                                    raise InstallerError('HA_REGISTRY_DETAILS_READ_FAILED')
+                                details = response['result']
+                                result['entities'] = [r | (details.get(r['entity_id']) or {}) for r in result['entities']]
+                                break
+                    return result
+        async def bounded():
+            async with asyncio.timeout(30):
+                return await read()
+        try:
+            return asyncio.run(bounded())
+        except InstallerError:
+            raise
+        except Exception:
+            raise InstallerError('HA_REGISTRY_READ_FAILED') from None
 
     def restart(self):
         self.request("POST", "/core/restart")

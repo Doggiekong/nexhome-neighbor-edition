@@ -1,2 +1,3 @@
 # Linux companion, separate from integration runtime. HA Core already supplies packaging.
 packaging==25.0
+aiohttp==3.14.5

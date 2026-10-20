@@ -11,7 +11,7 @@ ENTITY_FIELDS = ('id', 'entity_id', 'unique_id', 'platform', 'name', 'original_n
 DEVICE_FIELDS = ('id', 'identifiers', 'config_entries', 'name_by_user', 'area_id', 'disabled_by')
 
 
-def baseline(root):
+def baseline(root, registry_view=None):
     storage = root / '.storage'
     entries = load(storage / 'core.config_entries', {'data': {'entries': []}})['data']['entries']
     selected = [e for e in entries if e['domain'] == 'nexhome']
@@ -27,12 +27,27 @@ def baseline(root):
         ('entities', 'core.entity_registry', ENTITY_FIELDS),
         ('devices', 'core.device_registry', DEVICE_FIELDS),
     ]:
-        rows = load(storage / filename, {'data': {collection: []}})['data'][collection]
+        rows = (registry_view[collection] if registry_view is not None else
+                load(storage / filename, {'data': {collection: []}})['data'][collection])
         for row in rows:
+            if collection == 'devices':
+                # HA2026.10 v3 uses config_entry_id for a non-composite stored device.
+                row = dict(row)
+                row['config_entries'] = row.get('config_entries', [row['config_entry_id']] if row.get('config_entry_id') else [])
             relevant = row.get('config_entry_id') in ids if collection == 'entities' else bool(ids.intersection(row.get('config_entries', [])))
             if relevant:
                 key = row['entity_id'] if collection == 'entities' else row['id']
                 result[collection][key] = {k: row.get(k) for k in fields}
+                if collection == 'entities':
+                    if registry_view is not None and not isinstance(row.get('aliases'), list):
+                        raise InstallerError('ENTITY_DETAILS_SCHEMA_UNSUPPORTED')
+                    # HA's detailed API represents the computed-name sentinel as
+                    # null, while storage keeps it outside the user alias list.
+                    result[collection][key]['aliases'] = sorted(
+                        a for a in (row.get('aliases') or []) if isinstance(a, str)
+                    )
+    if any(row['device_id'] and row['device_id'] not in result['devices'] for row in result['entities'].values()):
+        raise InstallerError('DEVICE_SCHEMA_REQUIRES_SUPPORTED_REGISTRY_VIEW')
     # Hash user-owned references without trying to interpret or rewrite templates.
     paths = list(storage.glob('lovelace*')) + [storage / 'core.area_registry']
     paths += [root / n for n in ('configuration.yaml', 'automations.yaml', 'groups.yaml', 'scripts.yaml', 'scenes.yaml')]
@@ -44,9 +59,9 @@ def baseline(root):
     return result
 
 
-def preview(root, semantics=None):
+def preview(root, semantics=None, registry_view=None):
     """Caller supplies only explicitly reviewed legacy→semantic approvals, not guesses."""
-    captured = baseline(root)
+    captured = baseline(root, registry_view)
     approved = semantics or {}
     for legacy, record in approved.items():
         row = captured['entities'].get(legacy)
@@ -58,8 +73,8 @@ def preview(root, semantics=None):
             'semantics': approved, 'risk': 'ADDITIVE_FORWARD_ONLY_NO_REGISTRY_AUTORESTORE'}
 
 
-def validate(root, plan):
-    before, after = plan['baseline'], baseline(root)
+def validate(root, plan, registry_view=None):
+    before, after = plan['baseline'], baseline(root, registry_view)
     if digest(before) != plan['baseline_sha256']:
         raise InstallerError('MIGRATION_PREVIEW_TAMPERED')
     forward = False

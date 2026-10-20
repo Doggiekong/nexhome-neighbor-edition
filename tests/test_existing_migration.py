@@ -123,3 +123,42 @@ async def test_user_hidden_overrides_old_owned_marker(hass):
         row(spec, domain='light', unique_id=semantic_uid)],
         {spec.unique_id: {'owner': 'nexhome', 'semantic_unique_id': semantic_uid}})
     assert len(plan.specs) == 1 and plan.records[spec.unique_id]['status'] == 'user_intent_skip'
+
+
+async def test_semantic_marker_interruption_after_hide_resumes_without_duplicate(hass):
+    import copy
+    from types import SimpleNamespace
+
+    from custom_components.nexhome.migration import async_complete_semantic, plan_compatibility
+    entry = MockConfigEntry(domain='nexhome', data={})
+    entry.add_to_hass(hass)
+    spec = descriptions([device()], 'synthetic-gateway', 'compat')[0]
+    registry = er.async_get(hass)
+    legacy = registry.async_get_or_create('switch', 'nexhome', spec.unique_id,
+        suggested_object_id='stageb_interrupt', config_entry=entry)
+    markers = {spec.unique_id: {'owner': 'nexhome', 'approved_semantic': True,
+                               'legacy_entity_id': legacy.entity_id}}
+    plan = plan_compatibility([spec], [legacy], markers)
+    semantic = plan.specs[1]
+    registry.async_get_or_create('light', 'nexhome', semantic.unique_id,
+        suggested_object_id='stageb_interrupt', config_entry=entry)
+    persisted = []
+    class StoreFailSecond:
+        async def async_save(self, value):
+            if persisted:
+                raise OSError('Synthetic interruption after hide')
+            persisted.append(copy.deepcopy(value))
+    runtime = SimpleNamespace(plan=plan, markers=markers, store=StoreFailSecond())
+    with pytest.raises(OSError):
+        await async_complete_semantic(hass, runtime, semantic)
+    assert registry.async_get(legacy.entity_id).hidden_by == er.RegistryEntryHider.INTEGRATION
+    saved = persisted[0]
+    assert saved[spec.unique_id]['phase'] == 'SEMANTIC_REGISTERED'
+    rows = er.async_entries_for_config_entry(registry, entry.entry_id)
+    recovered = plan_compatibility([spec], rows, saved)
+    assert len(recovered.specs) == 2
+    assert recovered.records[spec.unique_id]['status'] == 'owned_semantic_reused'
+    runtime = SimpleNamespace(plan=recovered, markers=saved, store=AsyncMock())
+    await async_complete_semantic(hass, runtime, recovered.specs[1])
+    assert len(er.async_entries_for_config_entry(registry, entry.entry_id)) == 2
+    assert runtime.markers[spec.unique_id]['phase'] == 'COMPLETE'

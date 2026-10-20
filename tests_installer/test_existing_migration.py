@@ -151,3 +151,48 @@ def test_interrupted_migration_restores_without_recreating_entry(tmp_path, monke
     monkeypatch.setattr(engine, '_record', record)
     assert engine.recover()['status'] == 'ROLLED_BACK'
     assert baseline(root) == plan['baseline']
+
+
+def test_device_storage_v3_identity_not_silently_omitted(tmp_path):
+    root, _, _ = existing(tmp_path)
+    path = root / '.storage/core.device_registry'
+    data = json.loads(path.read_text())
+    row = data['data']['devices'][0]
+    row['config_entry_id'] = row.pop('config_entries')[0]
+    write(path, data)
+    assert len(baseline(root)['devices']) == 1
+
+
+def test_incomplete_device_schema_fails_closed(tmp_path):
+    root, _, _ = existing(tmp_path)
+    write(root / '.storage/core.device_registry', {'data': {'devices': []}})
+    with pytest.raises(InstallerError, match='DEVICE_SCHEMA'):
+        baseline(root)
+
+
+def test_live_registry_cache_change_detected_despite_old_disk(tmp_path):
+    root, runtime, engine = existing(tmp_path)
+    er = json.loads((root / '.storage/core.entity_registry').read_text())['data']['entities']
+    dr = json.loads((root / '.storage/core.device_registry').read_text())['data']['devices']
+    er[0]['aliases'] = []
+    view = {'entities': er, 'devices': dr}
+    runtime.registry_view = lambda: view
+    plan = preview(root, registry_view=view)
+    runtime.restart = lambda: view['entities'][0].update(name='Unapproved cache-only mutation')
+    with pytest.raises(InstallerError, match='RECOVERY_REQUIRED'):
+        engine.apply(artifact(tmp_path), migration_preview=plan)
+    # Old on-disk snapshot cannot trick the health gate into COMMITTED/ROLLED_BACK.
+    active = json.loads((engine.state / 'active.json').read_text())
+    assert active['phase'] == 'RECOVERY_REQUIRED'
+
+
+def test_computed_name_sentinel_normalized_but_user_alias_preserved(tmp_path):
+    root, _, _ = existing(tmp_path)
+    er = json.loads((root / '.storage/core.entity_registry').read_text())['data']['entities']
+    dr = json.loads((root / '.storage/core.device_registry').read_text())['data']['devices']
+    er[0]['aliases'] = [None]
+    assert baseline(root, {'entities': er, 'devices': dr}) == baseline(root)
+    plan = preview(root, registry_view={'entities': er, 'devices': dr})
+    er[0]['aliases'] = [None, 'User alias']
+    with pytest.raises(InstallerError, match='USER_METADATA_CHANGED'):
+        validate(root, plan, {'entities': er, 'devices': dr})

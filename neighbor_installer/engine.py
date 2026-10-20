@@ -26,6 +26,9 @@ class Installer:
     def inspect(self):
         return detect(self.root, self.trusted_trees)
 
+    def _registry_view(self):
+        return self.lifecycle.registry_view() if hasattr(self.lifecycle, 'registry_view') else None
+
     def _record(self, tx, phase, error=None):
         tx["phase"] = phase
         tx.setdefault("history", []).append({"phase": phase, "at": datetime.now(UTC).isoformat()})
@@ -92,7 +95,7 @@ class Installer:
                 raise InstallerError("HA_VERSION_OUTSIDE_TESTED_MATRIX")
             if any(state not in {"loaded", "not_loaded"} for state in probe.entry_states.values()):
                 raise InstallerError("EXISTING_ENTRY_REQUIRES_DIAGNOSIS_NO_AUTODISCOVERY")
-            if migration_preview and migration_baseline(self.root) != migration_preview['baseline']:
+            if migration_preview and migration_baseline(self.root, self._registry_view()) != migration_preview['baseline']:
                 raise InstallerError('MIGRATION_PREVIEW_STALE')
             tx = {
                 "id": uuid.uuid4().hex,
@@ -122,7 +125,7 @@ class Installer:
                 if inventory(self.target) != artifact.metadata["files"]:
                     raise InstallerError("POST_DEPLOY_HASH_MISMATCH")
                 if migration_preview:
-                    tx['identity_result'] = validate_migration(self.root, migration_preview)
+                    tx['identity_result'] = validate_migration(self.root, migration_preview, self._registry_view())
                 elif identity_fingerprint(self.root) != tx["before"]["identity_sha256"]:
                     raise InstallerError("IDENTITY_CHANGED_REVIEW_REQUIRED")
                 durable(self.state / "owner.json", {
@@ -180,11 +183,12 @@ class Installer:
             if inventory(self.target) != original["files"]:
                 raise InstallerError("RESTORE_HASH_MISMATCH")
             identity_unchanged = identity_fingerprint(self.root) == original["identity_sha256"]
-            if not identity_unchanged and original.get('migration_preview'):
-                tx['identity_result'] = validate_migration(self.root, original['migration_preview'])
+            if original.get('migration_preview'):
+                tx['identity_result'] = validate_migration(self.root, original['migration_preview'], self._registry_view())
                 # Even coherent additive metadata is not automatically reversed.
-                tx['code_restored'] = True
-                raise InstallerError('FORWARD_ONLY_REGISTRY_REVIEW_REQUIRED_CODE_RESTORED')
+                if tx['identity_result'] != 'REVERSIBLE':
+                    tx['code_restored'] = True
+                    raise InstallerError('FORWARD_ONLY_REGISTRY_REVIEW_REQUIRED_CODE_RESTORED')
             if not identity_unchanged:
                 raise InstallerError('IDENTITY_REVIEW_REQUIRED_CODE_RESTORED')
             self._record(tx, "ROLLED_BACK")
