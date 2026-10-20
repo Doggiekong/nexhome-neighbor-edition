@@ -2,6 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.storage import Store
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.nexhome import async_migrate_entry
@@ -117,6 +118,10 @@ async def test_real_registry_legacy_owned_hidden_and_user_customization(hass, ga
     registry.async_update_entity(rows[2].entity_id, name="User fixture name")
     gateway.login = AsyncMock()
     gateway.devices = AsyncMock(return_value=devices)
+    await Store(hass, 1, f'nexhome.semantic.{entry.entry_id}').async_save({
+        specs[0].unique_id: {'owner': 'nexhome', 'approved_semantic': True,
+                             'legacy_entity_id': rows[0].entity_id}
+    })
     for d in devices:
         gateway.values[(d["address"], "PowerSwitch")] = "0"
     with patch("custom_components.nexhome.GatewayClient", return_value=gateway):

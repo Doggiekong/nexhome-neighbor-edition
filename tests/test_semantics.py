@@ -59,8 +59,10 @@ def row(spec, **kwargs):
 def test_visible_legacy_preserved_and_semantic_predictable():
     spec = descriptions([device()], "synthetic-gateway", "compat")[0]
     legacy = row(spec)
-    one = plan_compatibility([spec], [legacy], {})
-    two = plan_compatibility([spec], [legacy], {})
+    approved = {spec.unique_id: {'owner': 'nexhome', 'approved_semantic': True,
+                               'legacy_entity_id': legacy.entity_id}}
+    one = plan_compatibility([spec], [legacy], approved)
+    two = plan_compatibility([spec], [legacy], approved)
     assert [s.domain for s in one.specs] == ["switch", "light"]
     assert one.specs == two.specs and one.specs[0].unique_id == spec.unique_id
     assert one.specs[0].device_identifier == one.specs[1].device_identifier
@@ -103,7 +105,9 @@ def test_integration_owned_hidden_is_not_user_hidden():
 
 def test_existing_legacy_fan_has_same_compatibility_policy():
     spec = descriptions([device("133")], "synthetic-gateway", "compat")[0]
-    result = plan_compatibility([spec], [row(spec)], {})
+    approved = {spec.unique_id: {'owner': 'nexhome', 'approved_semantic': True,
+                               'legacy_entity_id': 'switch.fixture_legacy'}}
+    result = plan_compatibility([spec], [row(spec)], approved)
     assert [s.domain for s in result.specs] == ["switch", "fan"]
     skipped = plan_compatibility([spec], [row(spec, hidden_by=er.RegistryEntryHider.USER)], {})
     assert [s.domain for s in skipped.specs] == ["switch"]

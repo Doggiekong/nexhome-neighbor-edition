@@ -9,6 +9,8 @@ from packaging.version import Version
 from .artifact import Artifact
 from .detection import Owner, detect, identity_fingerprint
 from .files import InstallerError, copy_tree, durable, guarded_root, inventory, load, lock, remove_owned
+from .identity import baseline as migration_baseline
+from .identity import validate as validate_migration
 
 TERMINAL = {"COMMITTED", "ROLLED_BACK"}
 
@@ -62,7 +64,7 @@ class Installer:
         if retired.exists():
             remove_owned(retired, parent)
 
-    def apply(self, artifact: Artifact, *, manual_fingerprint=None):
+    def apply(self, artifact: Artifact, *, manual_fingerprint=None, migration_preview=None):
         with lock(self.root):
             self._pending()
             artifact = artifact.revalidate()
@@ -90,6 +92,8 @@ class Installer:
                 raise InstallerError("HA_VERSION_OUTSIDE_TESTED_MATRIX")
             if any(state not in {"loaded", "not_loaded"} for state in probe.entry_states.values()):
                 raise InstallerError("EXISTING_ENTRY_REQUIRES_DIAGNOSIS_NO_AUTODISCOVERY")
+            if migration_preview and migration_baseline(self.root) != migration_preview['baseline']:
+                raise InstallerError('MIGRATION_PREVIEW_STALE')
             tx = {
                 "id": uuid.uuid4().hex,
                 "artifact": artifact.metadata,
@@ -99,6 +103,7 @@ class Installer:
                     "owner_marker": load(self.state / "owner.json"),
                     "identity_sha256": identity_fingerprint(self.root),
                     "entry_states": probe.entry_states, "ha_version": probe.ha_version,
+                    'migration_preview': migration_preview,
                 },
             }
             self._record(tx, "PRECHECK")
@@ -116,7 +121,9 @@ class Installer:
                     raise InstallerError("NEW_VERSION_HEALTH_FAILED")
                 if inventory(self.target) != artifact.metadata["files"]:
                     raise InstallerError("POST_DEPLOY_HASH_MISMATCH")
-                if identity_fingerprint(self.root) != tx["before"]["identity_sha256"]:
+                if migration_preview:
+                    tx['identity_result'] = validate_migration(self.root, migration_preview)
+                elif identity_fingerprint(self.root) != tx["before"]["identity_sha256"]:
                     raise InstallerError("IDENTITY_CHANGED_REVIEW_REQUIRED")
                 durable(self.state / "owner.json", {
                     "schema": 1, "owner": Owner.NEIGHBOR_INSTALLER, "files": artifact.metadata["files"],
@@ -173,6 +180,11 @@ class Installer:
             if inventory(self.target) != original["files"]:
                 raise InstallerError("RESTORE_HASH_MISMATCH")
             identity_unchanged = identity_fingerprint(self.root) == original["identity_sha256"]
+            if not identity_unchanged and original.get('migration_preview'):
+                tx['identity_result'] = validate_migration(self.root, original['migration_preview'])
+                # Even coherent additive metadata is not automatically reversed.
+                tx['code_restored'] = True
+                raise InstallerError('FORWARD_ONLY_REGISTRY_REVIEW_REQUIRED_CODE_RESTORED')
             if not identity_unchanged:
                 raise InstallerError('IDENTITY_REVIEW_REQUIRED_CODE_RESTORED')
             self._record(tx, "ROLLED_BACK")
