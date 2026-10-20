@@ -162,19 +162,26 @@ def test_conflicting_hacs_and_installer(setup):
         engine.apply(bundle, manual_fingerprint=engine.inspect()['tree_sha256'])
 
 
-def test_existing_identity_preserved(setup, tmp_path):
+@pytest.mark.parametrize('disabled', [False, True])
+def test_existing_identity_preserved(setup, tmp_path, disabled):
     root, runtime, engine, bundle = setup
     entries = {'data': {'entries': [{'entry_id': 'test-entry', 'domain': 'nexhome',
         'unique_id': 'test-id', 'title': 'Renamed', 'data': {'sn_input': 'SECRET_TEST_SN'},
-        'options': {}, 'disabled_by': None}]}}
+        'options': {}, 'disabled_by': 'user' if disabled else None}]}}
     write(root / '.storage/core.config_entries', entries)
     write(root / '.storage/core.entity_registry', {'data': {'entities': [{
         'entity_id': 'light.test', 'unique_id': 'test-uid', 'name': 'User name',
         'hidden_by': 'user', 'area_id': 'test-area', 'config_entry_id': 'test-entry',
     }]}})
     write(root / '.storage/core.area_registry', {'data': {'areas': [{'id': 'test-area', 'name': 'Test'}]}})
+    write(root / '.storage/core.device_registry', {'data': {'devices': [{
+        'id': 'fixture-device', 'identifiers': [['nexhome', 'fixture-id']],
+        'config_entries': ['test-entry'], 'name_by_user': 'Custom device', 'area_id': 'test-area',
+    }]}})
     write(root / '.storage/lovelace.test', {'cards': ['test']})
-    runtime.entries = {'test-entry': 'loaded'}
+    for filename in ['automations.yaml', 'groups.yaml', 'scripts.yaml', 'scenes.yaml', 'configuration.yaml']:
+        (root / filename).write_text('# User-owned fixture content\n')
+    runtime.entries = {'test-entry': 'not_loaded' if disabled else 'loaded'}
     before = inventory(root / '.storage')
     identity = identity_fingerprint(root)
     engine.apply(bundle)
