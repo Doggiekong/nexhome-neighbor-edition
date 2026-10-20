@@ -21,7 +21,7 @@
 
 ## 当前完成到哪里
 
-已有架构设计、有限真实环境中的本地可靠性修复与 NSDP discovery 证据。本分支将这些经验重组成独立 Candidate，加入有界异步传输、共享协调器、语义实体、保守迁移、diagnostics 和离线测试；这次重组代码尚未现场验收。
+已有架构设计与有限真实环境中的本地可靠性修复经验。本分支将这些经验重组成独立 Candidate，加入有界异步传输、共享协调器、语义实体、保守迁移、diagnostics 和离线测试。dev3 已在专用测试 HA 中完成单 Hub discovery、fresh identity 与有限代表性控制的受控现场验证；具体能力和未验证边界见[兼容矩阵](docs/device-compatibility.md)，不代表已在生产 HA 部署或完成长期验收。
 
 已验证：Home Assistant Core 可在不知道 Hub IP/SN 的前提下，通过 UDP1912 NSDP 广播取得 LOCATION 和 MODEL.sn；发现的 SN 与当前集成所需配置逐字符一致。
 

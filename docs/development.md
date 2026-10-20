@@ -31,11 +31,11 @@ HTTP connect 3s、read 8s、total 11s，单次响应最多 1 MiB。网关 schedu
 
 ## 审查重点与未验证项
 
-- Candidate 全新分层代码尚未现场运行；既有现场证据只覆盖兼容矩阵所列的有限行为。
+- dev3 已在专用测试 HA 中完成有限现场验证；当前 Candidate 与旧生产补丁的证据分开，范围见兼容矩阵，不代表全型号或长期验收。
 - 多 Hub、复杂网卡、VLAN、其他固件、真实 UDP payload 全集及长时间压力需后续受控验证。
 - wrapper 推断仅限可靠显式链接；不能证明所有用户模板的来源。见 identity 文档。
 - type3 外 climate、fan、sensor 多数型号只是 CODE SUPPORTED；type11 未验收动作，中途 cover Stop 未完整验收。
-- 没有恢复生产设备或改其配置的测试步骤；下一阶段必须另行批准、备份和制定现场迁移验收。
+- 本轮测试端已停用、原生产 client 已恢复；未把 Candidate 安装到生产 HA。任何后续生产迁移仍须另行批准、备份和验收。
 - 隐私检查是静态规则与人工上下文复核，不等于第三方安全审计。SN 本地配置/运行内存必需，但不写入仓库、日志或 diagnostics。
 
 相关说明：[兼容矩阵](device-compatibility.md)、[identity/迁移](identity-and-migration.md)、[上游对照](upstream-changes.md)。
