@@ -99,6 +99,10 @@ def identity_fingerprint(root):
     for name, (collection, keys) in specifications.items():
         data = load(storage / name, {"data": {collection: []}}).get("data", {}).get(collection, [])
         selected[name] = [{key: row.get(key) for key in keys} for row in data]
+        if name == 'core.config_entries':
+            for row, safe in zip(data, selected[name], strict=True):
+                if row.get('domain') == 'nexhome':
+                    safe['data_sha256'] = digest(row.get('data', {}))
     for path in sorted(storage.glob("lovelace*")):
         if path.is_file():
             selected[path.name] = digest(load(path))

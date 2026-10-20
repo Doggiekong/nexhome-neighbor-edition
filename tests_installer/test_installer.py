@@ -259,14 +259,14 @@ def test_symlink_boundary(tmp_path, child):
         Installer(root, Runtime())
 
 
-def test_unsupported_ha_and_unhealthy(setup):
+def test_unsupported_ha_and_unhealthy(setup, monkeypatch):
     _, runtime, engine, bundle = setup
     runtime.healthy = False
     with pytest.raises(InstallerError, match='HA_NOT_HEALTHY'):
         engine.apply(bundle)
     runtime.healthy = True
-    bundle.metadata['tested_ha_versions'] = []
-    with pytest.raises(InstallerError):
+    monkeypatch.setattr(runtime, 'probe', lambda: Probe('2026.9.0', True, True, False, {}))
+    with pytest.raises(InstallerError, match='HA_VERSION_OUTSIDE_TESTED_MATRIX'):
         engine.apply(bundle)
 
 

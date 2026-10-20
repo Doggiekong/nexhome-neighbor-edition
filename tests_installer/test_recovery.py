@@ -4,6 +4,7 @@ import json
 
 import pytest
 
+from neighbor_installer.detection import identity_fingerprint
 from neighbor_installer.engine import Installer
 from neighbor_installer.environment import inspect_environment
 from neighbor_installer.files import InstallerError, durable, inventory
@@ -151,6 +152,28 @@ def test_old_transaction_rollback_refused(tmp_path):
     engine.apply(artifact(tmp_path))
     with pytest.raises(InstallerError, match='ONLY_LATEST'):
         engine.rollback(first['transaction_id'])
+
+
+def test_failed_upgrade_does_not_hide_current_rollback_point(tmp_path):
+    root = tmp_path / 'config'
+    root.mkdir()
+    runtime = Runtime()
+    engine = Installer(root, runtime)
+    committed = engine.apply(artifact(tmp_path))
+    runtime.fail = True
+    assert engine.apply(artifact(tmp_path, '1.1.17.dev4'))['status'] == 'ROLLED_BACK'
+    assert engine.rollback(committed['transaction_id'])['status'] == 'ROLLED_BACK'
+    assert not engine.target.exists()
+
+
+def test_entry_data_change_detected_without_serializing_data(tmp_path):
+    path = tmp_path / '.storage/core.config_entries'
+    entry = {'domain': 'nexhome', 'entry_id': 'fixture', 'data': {'sn_input': 'fake-before'}}
+    durable(path, {'data': {'entries': [entry]}})
+    before = identity_fingerprint(tmp_path)
+    entry['data']['sn_input'] = 'fake-after'
+    durable(path, {'data': {'entries': [entry]}})
+    assert identity_fingerprint(tmp_path) != before
 
 
 def test_builder_requires_full_pin(tmp_path):

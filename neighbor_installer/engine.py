@@ -65,7 +65,7 @@ class Installer:
     def apply(self, artifact: Artifact, *, manual_fingerprint=None):
         with lock(self.root):
             self._pending()
-            artifact.revalidate()
+            artifact = artifact.revalidate()
             detected = self.inspect()
             if detected["owner"] in (Owner.OFFICIAL_HACS, Owner.COMMUNITY_HACS):
                 raise InstallerError("HACS_IS_UPDATE_OWNER")
@@ -209,7 +209,12 @@ class Installer:
             if not tx or tx.get("phase") != "COMMITTED":
                 raise InstallerError("NOT_A_COMMITTED_TRANSACTION")
             active = load(self.state / "active.json")
-            if not active or active.get("id") != transaction_id:
+            marker = load(self.state / 'owner.json', {})
+            restored_commit = (
+                active and active.get('phase') == 'ROLLED_BACK'
+                and marker.get('transaction_id') == transaction_id
+            )
+            if not active or (active.get("id") != transaction_id and not restored_commit):
                 raise InstallerError("ONLY_LATEST_TRANSACTION_CAN_ROLL_BACK")
             return self._restore(tx)
 
