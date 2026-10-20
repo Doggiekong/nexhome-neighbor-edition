@@ -81,7 +81,7 @@ def device(type_id="1", index="a"):
 
 def runtime_for(coordinator, type_id="1", mode="fresh"):
     spec = descriptions([device(type_id)], "synthetic-gateway", mode)[0]
-    coordinator.register(spec.address, spec.identifiers)
+    coordinator.register(spec.address, spec.identifiers, required_groups=spec.required_groups)
     return SimpleNamespace(
         coordinator=coordinator, mode=mode, plan=CompatibilityPlan([spec], {}), markers={}, store=AsyncMock()
     ), spec

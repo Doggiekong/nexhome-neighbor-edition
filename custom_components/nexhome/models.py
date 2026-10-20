@@ -28,6 +28,18 @@ class EntitySpec:
     def config(self):
         return CATALOG[self.type_id]["entities"][self.key]
 
+    @property
+    def required_groups(self):
+        """Alternative complete core-property sets; everything else is optional."""
+        if self.domain == "climate":
+            return [
+                {"PowerSwitch", "TemperatureSet"} | (set() if self.type_id in {"11", "35"} else {"WorkMode"})
+            ]
+        if self.domain == "cover":
+            core = {"Open", "Close"} | (set() if self.type_id == "30" else {"Stop"})
+            return [{"Location"}, core] if self.type_id == "6" else [core]
+        return [{"PowerSwitch"}] if "PowerSwitch" in self.identifiers else [set(self.identifiers)]
+
 
 def descriptions(devices, serial, mode):
     specs = []

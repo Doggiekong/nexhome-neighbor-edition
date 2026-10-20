@@ -96,7 +96,7 @@ async def async_setup_entry(hass, entry: ConfigEntry):
             existing = devices_registry.async_get_devices(identifiers={(DOMAIN, spec.device_identifier)})
             if any(device.config_entries - {entry.entry_id} for device in existing):
                 raise ConfigEntryError("Device identity conflicts with another entry; manual review needed")
-            coordinator.register(spec.address, spec.identifiers)
+            coordinator.register(spec.address, spec.identifiers, required_groups=spec.required_groups)
         await coordinator.async_refresh()
         if specs and not coordinator.values:
             raise ConfigEntryNotReady("No valid gateway properties available")

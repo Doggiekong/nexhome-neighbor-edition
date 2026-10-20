@@ -57,7 +57,11 @@ class NexhomeCover(NexhomeEntity, CoverEntity):
                 and position is not None
                 and self.coordinator.is_fresh(self.spec.address, ["Location"], after=after)
             ):
-                if abs(position - target) <= 1 or (previous is not None and abs(position - previous) >= 1):
+                if abs(position - target) <= 1 or (
+                    previous is not None
+                    and abs(position - previous) >= 1
+                    and (position - previous) * (target - previous) > 0
+                ):
                     self.confirmation = "position_observed"
                     return True
             if self._core_fresh(after) and (previous is None or identifier == "Stop"):

@@ -20,11 +20,10 @@ async def test_shared_chunking_partial_and_recovery(coordinator, gateway):
 
 
 async def test_missing_optional_still_publishes_valid_subset(coordinator, gateway):
-    coordinator.register("fixture-address", ["PowerSwitch", "Temperature"])
+    coordinator.register("fixture-address", ["PowerSwitch", "Temperature"], required_groups=[{"PowerSwitch"}])
     gateway.values[("fixture-address", "PowerSwitch")] = "1"
     for _ in range(2):
-        with pytest.raises(UpdateFailed):
-            await coordinator._async_update_data()
+        await coordinator._async_update_data()
     assert coordinator.is_fresh("fixture-address", ["PowerSwitch"])
     assert not coordinator.is_fresh("fixture-address", ["Temperature"])
     assert coordinator.data[("fixture-address", "PowerSwitch")] == "1"
@@ -88,3 +87,54 @@ async def test_push_debounce_never_applies_payload(coordinator, gateway):
         coordinator.request_refresh("fixture-address")
     await asyncio.gather(*list(coordinator.push_tasks.values()))
     assert len(gateway.reads) == 1 and coordinator.state("fixture-address", "PowerSwitch") == "0"
+
+
+async def test_required_missing_fails_then_recovers(coordinator, gateway):
+    coordinator.register("fixture-address", ["PowerSwitch", "Temperature"], required_groups=[{"PowerSwitch"}])
+    gateway.values[("fixture-address", "Temperature")] = 20
+    with pytest.raises(UpdateFailed, match="Required"):
+        await coordinator._async_update_data()
+    gateway.values[("fixture-address", "PowerSwitch")] = "1"
+    assert await coordinator._async_update_data()
+
+
+async def test_cover_alternative_core_sets_and_separate_sensor_requirements(coordinator, gateway):
+    coordinator.register(
+        "cover",
+        ["Location", "Open", "Close", "Stop"],
+        required_groups=[{"Location"}, {"Open", "Close", "Stop"}],
+    )
+    gateway.values[("cover", "Location")] = 50
+    assert await coordinator._async_update_data()
+    gateway.values.pop(("cover", "Location"))
+    for key in ("Open", "Close", "Stop"):
+        gateway.values[("cover", key)] = 1
+    assert await coordinator._async_update_data()
+    coordinator.register("sensor", ["Temperature"], required_groups=[{"Temperature"}])
+    coordinator.register("sensor", ["Humidity"], required_groups=[{"Humidity"}])
+    gateway.values[("sensor", "Temperature")] = 20
+    with pytest.raises(UpdateFailed):
+        await coordinator._async_update_data()
+
+
+async def test_cancelled_command_clears_pending_and_releases_device_lock(coordinator, gateway):
+    coordinator.register("fixture-address", ["PowerSwitch"])
+    entered, gate = asyncio.Event(), asyncio.Event()
+    original = gateway.properties
+
+    async def blocked(params):
+        entered.set()
+        await gate.wait()
+        return await original(params)
+
+    gateway.properties = blocked
+    task = asyncio.create_task(
+        coordinator.command("fixture-address", [{"identifier": "PowerSwitch", "value": "1"}])
+    )
+    await entered.wait()
+    task.cancel()
+    await asyncio.gather(task, return_exceptions=True)
+    assert not coordinator.pending and coordinator.waiting == 0
+    gateway.properties = original
+    await coordinator.command("fixture-address", [{"identifier": "PowerSwitch", "value": "0"}])
+    assert coordinator.state("fixture-address", "PowerSwitch") == "0"

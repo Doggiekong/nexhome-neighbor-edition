@@ -33,6 +33,8 @@ class GatewayCoordinator(DataUpdateCoordinator):
         self.client = client
         self.clock = clock
         self.targets = {}
+        self.requirements = {}
+        self.read_received = set()
         self.values = {}
         self.fresh = {}
         self.pending = {}
@@ -45,8 +47,12 @@ class GatewayCoordinator(DataUpdateCoordinator):
         self.missing_count = 0
         self.closed = False
 
-    def register(self, address, identifiers):
+    def register(self, address, identifiers, *, required_groups=None):
         self.targets.setdefault(address, set()).update(identifiers)
+        groups = required_groups if required_groups is not None else [set(identifiers)]
+        alternatives = tuple(frozenset(group) for group in groups)
+        if alternatives not in self.requirements.setdefault(address, []):
+            self.requirements[address].append(alternatives)
 
     def is_fresh(self, address, identifiers, *, after=0):
         now = self.clock()
@@ -81,7 +87,7 @@ class GatewayCoordinator(DataUpdateCoordinator):
         self._notify()
         self._schedule_expiry()
 
-    def apply_rows(self, rows, params, started):
+    def apply_rows(self, rows, params, started, accepted=None):
         wanted = {(p["address"], p["identifier"]) for p in params}
         seen = set()
         for row in rows:
@@ -95,6 +101,8 @@ class GatewayCoordinator(DataUpdateCoordinator):
             seen.add(key)
             if started < self.protected.get(key[0], 0):
                 continue
+            if accepted is not None:
+                accepted.add(key)
             self.values[key] = row["value"]
             self.fresh[key] = self.clock()
             self.pending.pop(key, None)
@@ -109,24 +117,30 @@ class GatewayCoordinator(DataUpdateCoordinator):
                 for i in sorted(ids)
             ]
             missing = 0
+            received = set()
             try:
                 for offset in range(0, len(params), CHUNK_SIZE):
                     chunk = params[offset : offset + CHUNK_SIZE]
                     started = self.clock()
                     rows = await self.client.properties(chunk)
-                    missing += self.apply_rows(rows, chunk, started)
+                    missing += self.apply_rows(rows, chunk, started, received)
             finally:
                 self.missing_count = missing
+                self.read_received = received
                 self._notify()  # Valid partial data stays visible even on consecutive failures.
             return missing
 
     async def _async_update_data(self):
         try:
-            missing = await self.read()
+            await self.read()
         except GatewayError:
             raise UpdateFailed("Gateway polling failed") from None
-        if missing:
-            raise UpdateFailed("Some requested gateway properties are missing or invalid")
+        if any(
+            not any(all((address, field) in self.read_received for field in group) for group in alternatives)
+            for address, groups in self.requirements.items()
+            for alternatives in groups
+        ):
+            raise UpdateFailed("Required gateway properties are missing or invalid")
         return dict(self.values)
 
     async def command(

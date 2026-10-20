@@ -174,6 +174,24 @@ async def test_cover_real_position_and_unsupported_stop(coordinator, gateway):
         await other.async_stop_cover()
 
 
+async def test_cover_wrong_direction_is_not_confirmation(coordinator, gateway):
+    runtime, spec = runtime_for(coordinator, "6")
+    gateway.values[(spec.address, "Location")] = 50
+    await coordinator.read()
+    entity = NexhomeCover(runtime, spec)
+    outcomes = []
+
+    async def inspect_send(commands, **kwargs):
+        for position in (49, 51):
+            gateway.values[(spec.address, "Location")] = position
+            await coordinator.read()
+            outcomes.append(kwargs["verdict"](0))
+
+    entity.send = inspect_send
+    await entity.async_open_cover()
+    assert outcomes == [False, True]
+
+
 async def test_optional_capabilities_require_actual_properties(coordinator, gateway):
     runtime, spec = runtime_for(coordinator, "51")
     gateway.values[(spec.address, "PowerSwitch")] = "1"
