@@ -1,7 +1,7 @@
 """Wire constants and conservative candidate defaults."""
 
 DOMAIN = "nexhome"
-VERSION = "1.1.17.dev1"
+VERSION = "1.1.17.dev2"
 UPSTREAM_VERSION = "1.1.16"
 IP_CONFIG = "ip_address"
 SN_CONFIG = "sn_input"

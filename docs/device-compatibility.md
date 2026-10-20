@@ -1,6 +1,6 @@
 # 设备兼容性与证据边界
 
-版本：Community Candidate `1.1.17.dev1`，Based on upstream NEXhome v1.1.16。
+版本：Community Candidate `1.1.17.dev2`，Based on upstream NEXhome v1.1.16。
 
 **本候选代码只完成离线验证，没有安装到生产 HA，没有重新操作真实设备。** 下表的 FIELD_VERIFIED 指此前本地修复的有限现场证据，不代表这一重构版本已经现场验收。
 
@@ -33,6 +33,7 @@
 - climate：PowerSwitch、TemperatureSet 必需，空调还需 WorkMode；地暖不强求 WorkMode。Temperature、Windspeed、WindDirection 是可选状态，不拖累整机 availability。可选控制若无法读回，服务报未确认，不永久预测成功。
 - cover：有效 Location 或新鲜核心控制字段可以维持可用；Open/Close/Stop 固定 `1` 只能说明核心字段可读，**不是真实开合**。无位置设备的成功反馈明确为 `core_readback_only`，不能证明运动或最终停止。
 - 所有属性 15 秒新鲜度，pending 5 秒。命令前旧查询不能覆盖命令后状态；新真实读回具有权威性。缺字段不会更新时间戳。
+- 可选属性缺失保留缺失计数和独立过期信息，不把整轮 coordinator 判失败；必需字段或所有替代核心字段集合均缺失时才报告 UpdateFailed。HTTP/解析故障仍明确失败。
 - 默认 3 秒共享轮询，但网关变慢、大属性集合、失败超时或负载会延长完整周期，**不承诺任何规模都在 3 秒内收敛**。超过新鲜度应如实 unavailable。
 
 ## 发现与 UDP

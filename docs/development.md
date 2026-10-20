@@ -1,6 +1,6 @@
 # Phase 1 Candidate 开发与验证
 
-开发版本 `1.1.17.dev1`；manifest 使用合法 PEP 440 dev version，不伪装官方 `1.1.16`。
+开发版本 `1.1.17.dev2`；manifest 使用合法 PEP 440 dev version，不伪装官方 `1.1.16`。
 
 本分支只含 Community integration。没有 Installer、部署脚本、HACS ownership 切换器、LICENSE 决策、Release 或 Beta 邀请。main 仍保持原架构文档基线。
 

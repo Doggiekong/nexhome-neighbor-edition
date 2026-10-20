@@ -2,6 +2,8 @@
 
 日期：2026-10-20。版本：`1.1.17.dev1`。分支：`phase1/community-integration-core`。
 
+本页是首次 Candidate 的历史验证记录；当前 `1.1.17.dev2` 的复审、修复与 112 项测试见 [Review Gate](phase1-review-gate.md)。历史现场边界未扩大。
+
 ## 结果
 
 - **107 tests passed**，Python 3.14.4 / 真实 Home Assistant 2026.10.2 / pytest-homeassistant-custom-component 0.13.373。

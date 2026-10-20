@@ -29,7 +29,7 @@ Based on upstream **nexhome-org/nexhome-homeassistant-component v1.1.16**，comm
 
 同步 requests 改为 HA 共用 aiohttp session，不借助外层协程 timeout 掩盖阻塞线程，也不建立每设备 SyncWorker 轮询。网关请求最多 1 inflight，队列上限 32，最多连续 3 条控制后让轮询得到机会。同设备 command FIFO；多属性控制承认可能部分生效，不盲目重发。
 
-所有模型共用 coordinator 数据。失败与缺值不刷新时间戳；partial poll 在 coordinator 层报告失败，实体 availability 按各自 required 字段判断，避免可选字段让整台空调/窗帘 unavailable。
+所有模型共用 coordinator 数据。失败与缺值不刷新时间戳；必需字段缺失的 partial poll 在 coordinator 层报告失败，可选缺失单独记录，实体 availability 按各自 required 字段判断，避免可选字段让整台空调/窗帘 unavailable。
 
 新增 migration.py、diagnostics.py 与离线 tests，是 Community 的保护机制；不是生产目录的临时补丁。移除所有临时诊断入口、调试 print、家庭实例、设备名称、生产地址、凭据和本地路径。
 

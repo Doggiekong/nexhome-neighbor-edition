@@ -1,6 +1,6 @@
 # NEXhome Neighbor Edition
 
-**Status: Phase 1 Community Integration Candidate — 1.1.17.dev1**
+**Status: Phase 1 Community Integration Candidate — 1.1.17.dev2**
 
 为使用 NEXhome 的住户开发更稳定的 Home Assistant 接入方案。本分支包含 Community integration 候选代码和隔离离线测试，**未部署生产、未发布正式 Community Release、没有 Installer**。
 
@@ -43,5 +43,6 @@
 - [Identity 与保守迁移](docs/identity-and-migration.md)
 - [上游逐文件对照](docs/upstream-changes.md)
 - [Phase 1 验证记录](docs/phase1-validation.md)
+- [Phase 1 Review Gate](docs/phase1-review-gate.md)
 
 候选代码基于上游 NEXhome v1.1.16，不包含家庭配置、日志、备份、真实设备标识或生产部署脚本。仓库保持 PRIVATE；只有完成 Public Readiness Review 并经项目发起人明确决定后，才考虑公开。开发分支不得作为生产安装指引。
