@@ -41,6 +41,7 @@ class Session:
         (b'{"code":0}', 200),
         (b'{"code":0,"result":{}}', 500),
         (b"[]", 200),
+        (b"[" * 2000 + b"0" + b"]" * 2000, 200),
     ],
 )
 async def test_http_errors_redacted(body, status):

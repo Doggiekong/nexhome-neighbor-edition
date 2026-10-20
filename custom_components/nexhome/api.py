@@ -85,7 +85,7 @@ class GatewayClient:
                 self.stats["timeouts"] += 1
                 self.stats["errors"] += 1
                 raise GatewayError("Gateway timed out; command outcome may be unknown") from None
-            except aiohttp.ClientError, ValueError, UnicodeError:
+            except aiohttp.ClientError, ValueError, UnicodeError, RecursionError:
                 self.stats["errors"] += 1
                 raise GatewayError("Gateway transport or JSON failure") from None
             except GatewayError:
