@@ -1,6 +1,6 @@
 # 设备兼容性与证据边界
 
-版本：Community Candidate `1.1.17.dev2`，Based on upstream NEXhome v1.1.16。
+版本：Community Candidate `1.1.17.dev3`，Based on upstream NEXhome v1.1.16。设备控制的现场状态未因 B2 discovery 修复而升级。
 
 **本候选代码只完成离线验证，没有安装到生产 HA，没有重新操作真实设备。** 下表的 FIELD_VERIFIED 指此前本地修复的有限现场证据，不代表这一重构版本已经现场验收。
 

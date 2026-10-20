@@ -18,6 +18,51 @@ async def test_discovery_flow_zero_one_multiple(hass, count, step):
     assert result["type"] == (FlowResultType.MENU if count == 0 else FlowResultType.FORM)
 
 
+async def test_real_discovery_with_empty_model_segment_reaches_single_hub_confirm(hass):
+    class DiscoverySocket:
+        def setsockopt(self, *args):
+            pass
+
+        def bind(self, address):
+            self.address = address
+
+        def getsockname(self):
+            return self.address[0], 45000
+
+        def setblocking(self, value):
+            pass
+
+        def sendto(self, data, destination):
+            assert destination == ("192.0.2.255", 1912)
+
+        def close(self):
+            pass
+
+    body = (
+        b"HTTP/1.1 200 OK\r\nLOCATION: http://192.0.2.10:8085\r\n"
+        b"MODEL: agent=fixture&&sn=synthetic-empty-segment&productid=fixture\r\n\r\n"
+    )
+    with (
+        patch(
+            "custom_components.nexhome.discovery.network.async_get_adapters",
+            AsyncMock(
+                return_value=[{"enabled": True, "ipv4": [{"address": "192.0.2.2", "network_prefix": 24}]}]
+            ),
+        ),
+        patch("custom_components.nexhome.discovery.socket.socket", return_value=DiscoverySocket()),
+        patch.object(
+            hass.loop, "sock_recvfrom", AsyncMock(side_effect=[(body, ("192.0.2.10", 1912)), TimeoutError()])
+        ),
+        patch("custom_components.nexhome.config_flow.GatewayClient") as client,
+    ):
+        result = await hass.config_entries.flow.async_init("nexhome", context={"source": "user"})
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "confirm"
+    client.assert_not_called()
+    assert not hass.config_entries.async_entries("nexhome")
+    hass.config_entries.flow.async_abort(result["flow_id"])
+
+
 async def test_fresh_confirm_creates_entry_without_secrets_in_title(hass):
     client = AsyncMock()
     with (

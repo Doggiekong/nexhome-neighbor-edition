@@ -1,6 +1,6 @@
 # Phase 1 Candidate 开发与验证
 
-开发版本 `1.1.17.dev2`；manifest 使用合法 PEP 440 dev version，不伪装官方 `1.1.16`。
+开发版本 `1.1.17.dev3`；manifest 使用合法 PEP 440 dev version，不伪装官方 `1.1.16`。dev3 仅修复 NSDP MODEL 空分隔段兼容性，受控现场范围见 [B2 诊断](b2-discovery-diagnostic.md)。
 
 本分支只含 Community integration。没有 Installer、部署脚本、HACS ownership 切换器、LICENSE 决策、Release 或 Beta 邀请。main 仍保持原架构文档基线。
 

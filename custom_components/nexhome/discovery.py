@@ -38,6 +38,9 @@ def parse_headers(packet):
 def parse_model(value):
     result = {}
     for item in unquote_plus(value).split("&"):
+        # Real NSDP senders may include empty query segments between fields.
+        if not item:
+            continue
         if "=" not in item:
             raise ValueError("Malformed model")
         key, value = item.split("=", 1)

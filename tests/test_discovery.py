@@ -3,7 +3,13 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from custom_components.nexhome.discovery import Hub, PushDispatcher, async_discover, parse_discovery
+from custom_components.nexhome.discovery import (
+    Hub,
+    PushDispatcher,
+    async_discover,
+    parse_discovery,
+    parse_model,
+)
 
 
 def packet(serial="synthetic-a", host="192.0.2.10", model=None):
@@ -17,6 +23,29 @@ def test_location_and_model_identity_exact():
     hub = parse_discovery(packet(model="sn=synthetic%2DCase&productId=fixture"), ("192.0.2.10", 1912))
     assert hub == Hub("192.0.2.10:8085", "synthetic-Case")
     assert "synthetic-Case" not in repr(hub)
+
+
+@pytest.mark.parametrize(
+    "model",
+    [
+        "sn=synthetic-a&productid=fixture&",
+        "&sn=synthetic-a&productid=fixture",
+        "agent=fixture&os=fixture&device=fixture&sw=1&hw=1&&sn=synthetic-a&productid=fixture",
+        "&&sn=synthetic-a&&productid=fixture&&",
+        "sn%3Dsynthetic-a%26%26productid%3Dfixture",
+    ],
+)
+def test_empty_model_separator_segments_do_not_discard_valid_identity(model):
+    assert parse_model(model)["sn"] == "synthetic-a"
+    assert parse_discovery(packet(model=model), ("192.0.2.10", 1912)) == Hub("192.0.2.10:8085", "synthetic-a")
+
+
+@pytest.mark.parametrize(
+    "model", ["sn=one&&sn=two", "sn=one&&broken", "sn=&&productid=fixture", "&&productid=fixture"]
+)
+def test_empty_model_segments_do_not_relax_duplicate_malformed_or_missing_identity(model):
+    with pytest.raises((ValueError, KeyError)):
+        parse_discovery(packet(model=model), ("192.0.2.10", 1912))
 
 
 @pytest.mark.parametrize(
