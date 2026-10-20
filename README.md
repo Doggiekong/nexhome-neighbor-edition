@@ -1,8 +1,8 @@
 # NEXhome Neighbor Edition
 
-**Status: Architecture / Prototype Planning**
+**Status: Phase 1 Community Integration Candidate — 1.1.17.dev1**
 
-为使用 NEXhome 的住户规划更稳定、更易安装的 Home Assistant 接入方案。本项目仍处于架构与原型规划阶段，**没有发布正式 Installer、Community release 或可安装产品**。
+为使用 NEXhome 的住户开发更稳定的 Home Assistant 接入方案。本分支包含 Community integration 候选代码和隔离离线测试，**未部署生产、未发布正式 Community Release、没有 Installer**。
 
 ## 希望解决的问题
 
@@ -21,7 +21,7 @@
 
 ## 当前完成到哪里
 
-已有架构设计、核心问题分析、有限真实测试环境中的可靠性修复验证，以及 NSDP discovery 验证。
+已有架构设计、有限真实环境中的本地可靠性修复与 NSDP discovery 证据。本分支将这些经验重组成独立 Candidate，加入有界异步传输、共享协调器、语义实体、保守迁移、diagnostics 和离线测试；这次重组代码尚未现场验收。
 
 已验证：Home Assistant Core 可在不知道 Hub IP/SN 的前提下，通过 UDP1912 NSDP 广播取得 LOCATION 和 MODEL.sn；发现的 SN 与当前集成所需配置逐字符一致。
 
@@ -38,5 +38,10 @@
 - [隐私与安全原则](docs/privacy-and-safety.md)：数据在哪里、谁能访问、如何授权和恢复。
 - [总体架构](docs/architecture.md)：分层、平台矩阵、状态机、更新所有权、回滚与公开门槛。
 - [未来安装流程](docs/installation-flow.md)：三类用户的预期体验与目前边界。
+- [Phase 1 开发与离线验证](docs/development.md)
+- [设备兼容矩阵与现场边界](docs/device-compatibility.md)
+- [Identity 与保守迁移](docs/identity-and-migration.md)
+- [上游逐文件对照](docs/upstream-changes.md)
+- [Phase 1 验证记录](docs/phase1-validation.md)
 
-当前仓库仅包含公开准备文档，不包含家庭配置、日志、备份、设备标识、生产集成代码或安装脚本。仓库保持 PRIVATE；只有完成 Public Readiness Review 并经项目发起人明确决定后，才考虑公开。
+候选代码基于上游 NEXhome v1.1.16，不包含家庭配置、日志、备份、真实设备标识或生产部署脚本。仓库保持 PRIVATE；只有完成 Public Readiness Review 并经项目发起人明确决定后，才考虑公开。开发分支不得作为生产安装指引。
