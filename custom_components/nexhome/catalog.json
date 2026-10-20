@@ -1,0 +1,876 @@
+{
+  "6": {
+    "name": "窗帘",
+    "entities": {
+      "6_curtain": {
+        "name": "窗帘",
+        "type": "cover",
+        "icon": "mdi:curtains",
+        "max": 100,
+        "min": 0,
+        "step": 1,
+        "identifiers": [
+          "Location"
+        ]
+      }
+    }
+  },
+  "108": {
+    "name": "窗帘（开关停）",
+    "entities": {
+      "108_curtain": {
+        "name": "窗帘（开关停）",
+        "type": "cover",
+        "icon": "mdi:curtains",
+        "identifiers": [
+          "Open",
+          "Close",
+          "Stop"
+        ]
+      }
+    }
+  },
+  "30": {
+    "name": "窗帘（开关）",
+    "entities": {
+      "30_curtain": {
+        "name": "窗帘（开关）",
+        "type": "cover",
+        "icon": "mdi:curtains",
+        "identifiers": [
+          "Open",
+          "Close"
+        ]
+      }
+    }
+  },
+  "2": {
+    "name": "调光灯",
+    "entities": {
+      "2_light": {
+        "name": "调光灯",
+        "type": "light",
+        "icon": "mdi:lightbulb",
+        "identifiers": [
+          "Brightness",
+          "PowerSwitch"
+        ]
+      }
+    }
+  },
+  "51": {
+    "name": "色温灯",
+    "entities": {
+      "51_light": {
+        "name": "色温灯",
+        "type": "light",
+        "icon": "mdi:lightbulb",
+        "identifiers": [
+          "Brightness",
+          "PowerSwitch",
+          "ColorTem"
+        ]
+      }
+    }
+  },
+  "1": {
+    "name": "灯",
+    "entities": {
+      "1_light": {
+        "name": "开关",
+        "type": "switch",
+        "icon": "mdi:power",
+        "identifiers": [
+          "PowerSwitch"
+        ]
+      }
+    }
+  },
+  "3": {
+    "name": "空调",
+    "entities": {
+      "3_climate": {
+        "name": "空调",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed",
+          "WorkMode",
+          "Temperature",
+          "TemperatureSet"
+        ]
+      }
+    }
+  },
+  "73": {
+    "name": "空调（摆风+风向3档）",
+    "entities": {
+      "73_climate": {
+        "name": "空调（摆风+风向3档）",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed",
+          "WorkMode",
+          "Temperature",
+          "TemperatureSet",
+          "WindDirection"
+        ]
+      }
+    }
+  },
+  "100": {
+    "name": "空调（风速2档+自动）",
+    "entities": {
+      "100_climate": {
+        "name": "空调（风速2档+自动）",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed",
+          "WorkMode",
+          "Temperature",
+          "TemperatureSet"
+        ]
+      }
+    }
+  },
+  "101": {
+    "name": "空调（风速5档+自动）",
+    "entities": {
+      "101_climate": {
+        "name": "空调（风速5档+自动）",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed",
+          "WorkMode",
+          "Temperature",
+          "TemperatureSet"
+        ]
+      }
+    }
+  },
+  "102": {
+    "name": "空调（风速7档+自动）",
+    "entities": {
+      "102_climate": {
+        "name": "空调（风速7档+自动）",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed",
+          "WorkMode",
+          "Temperature",
+          "TemperatureSet"
+        ]
+      }
+    }
+  },
+  "107": {
+    "name": "空调（模式+地暖）",
+    "entities": {
+      "107_climate": {
+        "name": "空调（模式+地暖）",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed",
+          "WorkMode",
+          "Temperature",
+          "TemperatureSet"
+        ]
+      }
+    }
+  },
+  "5": {
+    "name": "温湿度传感器",
+    "entities": {
+      "5_humidity": {
+        "type": "sensor",
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement",
+        "identifiers": [
+          "Humidity"
+        ]
+      },
+      "5_temperature": {
+        "type": "sensor",
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement",
+        "identifiers": [
+          "Temperature"
+        ]
+      }
+    }
+  },
+  "10": {
+    "name": "新风",
+    "entities": {
+      "10_fan": {
+        "name": "开关",
+        "type": "fan",
+        "icon": "mdi:fan",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed"
+        ]
+      }
+    }
+  },
+  "75": {
+    "name": "新风（仅支持开关）",
+    "entities": {
+      "75_fan": {
+        "name": "新风（仅支持开关）",
+        "type": "fan",
+        "icon": "mdi:fan",
+        "identifiers": [
+          "PowerSwitch"
+        ]
+      }
+    }
+  },
+  "11": {
+    "name": "地暖",
+    "entities": {
+      "11_climate": {
+        "name": "地暖",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Temperature",
+          "TemperatureSet"
+        ]
+      }
+    }
+  },
+  "35": {
+    "name": "地暖（仅支持开关+温度）",
+    "entities": {
+      "35_climate": {
+        "name": "地暖（仅支持开关+温度）",
+        "type": "climate",
+        "icon": "mdi:air-conditioner",
+        "identifiers": [
+          "PowerSwitch",
+          "Temperature",
+          "TemperatureSet"
+        ]
+      }
+    }
+  },
+  "8": {
+    "name": "空气质量传感器（PM2.5、CO2、甲醛、温度、湿度六合一隐藏光照）",
+    "entities": {
+      "8_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "8_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "8_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "8_HCHO": {
+        "type": "sensor",
+        "identifiers": [
+          "HCHO"
+        ],
+        "name": "甲醛",
+        "icon": "mdi:molecule",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "8_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "12": {
+    "name": "空气检测仪（PM2.5、CO2、甲醛、温度、湿度五合一）",
+    "entities": {
+      "12_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "12_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "12_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "12_HCHO": {
+        "type": "sensor",
+        "identifiers": [
+          "HCHO"
+        ],
+        "name": "甲醛",
+        "icon": "mdi:molecule",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "12_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      },
+      "12_LUX": {
+        "type": "sensor",
+        "name": "LUX",
+        "identifiers": [
+          "LUX"
+        ],
+        "device_class": "illuminance",
+        "unit": "lx",
+        "state_class": "measurement"
+      },
+      "12_VOC": {
+        "type": "sensor",
+        "identifiers": [
+          "VOC"
+        ],
+        "name": "VOC",
+        "icon": "mdi:heat-wave",
+        "unit": "ppm",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "13": {
+    "name": "空气检测仪（CO2、温度、湿度三合一）",
+    "entities": {
+      "13_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      },
+      "13_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "13_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "14": {
+    "name": "空气检测仪（PM2.5、CO2、温度、湿度四合一）",
+    "entities": {
+      "14_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      },
+      "14_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "14_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "15": {
+    "name": "空气检测仪（PM2.5、温度、湿度三合一）",
+    "entities": {
+      "15_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "15_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "15_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "16": {
+    "name": "空气检测仪（CO2、甲醛、温度、湿度四合一）",
+    "entities": {
+      "16_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "16_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "16_HCHO": {
+        "type": "sensor",
+        "identifiers": [
+          "HCHO"
+        ],
+        "name": "甲醛",
+        "icon": "mdi:molecule",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "16_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "59": {
+    "name": "空气检测仪（PM2.5、CO2、甲醛、温度、湿度、VOC六合一）",
+    "entities": {
+      "59_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "59_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "59_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "59_HCHO": {
+        "type": "sensor",
+        "identifiers": [
+          "HCHO"
+        ],
+        "name": "甲醛",
+        "icon": "mdi:molecule",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "59_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      },
+      "59_VOC": {
+        "type": "sensor",
+        "identifiers": [
+          "VOC"
+        ],
+        "name": "VOC",
+        "icon": "mdi:heat-wave",
+        "unit": "ppm",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "60": {
+    "name": "空气检测仪（PM2.5、CO2、甲醛、温度、湿度、PM10六合一）",
+    "entities": {
+      "60_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "60_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "60_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "60_HCHO": {
+        "type": "sensor",
+        "identifiers": [
+          "HCHO"
+        ],
+        "name": "甲醛",
+        "icon": "mdi:molecule",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "60_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      },
+      "60_PM10": {
+        "type": "sensor",
+        "identifiers": [
+          "PM10"
+        ],
+        "name": "PM 10",
+        "device_class": "pm10",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "61": {
+    "name": "空气检测仪（PM2.5、CO2、温度、湿度、PM10五合一）",
+    "entities": {
+      "61_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "61_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "61_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "61_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      },
+      "61_PM10": {
+        "type": "sensor",
+        "identifiers": [
+          "PM10"
+        ],
+        "name": "PM 10",
+        "device_class": "pm10",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "62": {
+    "name": "空气检测仪（PM2.5、温度、湿度、PM10四合一）",
+    "entities": {
+      "62_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "62_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "62_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "62_PM10": {
+        "type": "sensor",
+        "identifiers": [
+          "PM10"
+        ],
+        "name": "PM 10",
+        "device_class": "pm10",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "110": {
+    "name": "空气检测仪（PM2.5、PM10、CO2、温度、湿度、VOC六合一）",
+    "entities": {
+      "110_Humidity": {
+        "type": "sensor",
+        "identifiers": [
+          "Humidity"
+        ],
+        "name": "湿度",
+        "device_class": "humidity",
+        "unit": "%",
+        "state_class": "measurement"
+      },
+      "110_Temperature": {
+        "type": "sensor",
+        "identifiers": [
+          "Temperature"
+        ],
+        "name": "温度",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement"
+      },
+      "110_PM25": {
+        "type": "sensor",
+        "identifiers": [
+          "PM25"
+        ],
+        "name": "PM 2.5",
+        "device_class": "pm25",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "110_PM10": {
+        "type": "sensor",
+        "identifiers": [
+          "PM10"
+        ],
+        "name": "PM 10",
+        "device_class": "pm10",
+        "unit": "µg/m³",
+        "state_class": "measurement"
+      },
+      "110_CO2": {
+        "type": "sensor",
+        "identifiers": [
+          "CO2"
+        ],
+        "name": "CO2",
+        "device_class": "carbon_dioxide",
+        "unit": "ppm",
+        "state_class": "measurement"
+      },
+      "110_VOC": {
+        "type": "sensor",
+        "identifiers": [
+          "VOC"
+        ],
+        "name": "VOC",
+        "icon": "mdi:heat-wave",
+        "unit": "ppm",
+        "state_class": "measurement"
+      }
+    }
+  },
+  "132": {
+    "name": "雾化",
+    "entities": {
+      "132_switch": {
+        "name": "开关",
+        "type": "switch",
+        "icon": "mdi:power",
+        "identifiers": [
+          "PowerSwitch"
+        ]
+      }
+    }
+  },
+  "133": {
+    "name": "排风扇",
+    "entities": {
+      "133_fan": {
+        "name": "开关",
+        "type": "fan",
+        "icon": "mdi:fan",
+        "identifiers": [
+          "PowerSwitch",
+          "Windspeed"
+        ]
+      }
+    }
+  }
+}
