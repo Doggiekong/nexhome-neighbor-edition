@@ -1,0 +1,42 @@
+{
+  "title": "NEXhome Community",
+  "config": {
+    "step": {
+      "confirm": {
+        "title": "Confirm local gateway",
+        "description": "Connect the gateway at {endpoint}. No device control is performed."
+      },
+      "manual": {
+        "title": "Advanced local configuration",
+        "data": {
+          "ip_address": "IPv4 address and port",
+          "sn": "Local gateway identity"
+        }
+      },
+      "select_hub": {
+        "title": "Choose a gateway",
+        "data": {
+          "hub": "Gateway"
+        }
+      },
+      "no_hubs": {
+        "title": "No local gateway found",
+        "description": "Check that Home Assistant and the gateway share the same LAN. No network scan is performed.",
+        "menu_options": {
+          "retry": "Retry local discovery",
+          "manual": "Advanced manual configuration"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot initialize the local gateway.",
+      "invalid_input": "Invalid local gateway parameters."
+    },
+    "abort": {
+      "already_configured": "This gateway is already configured.",
+      "identity_mismatch": "The discovered gateway has a different identity; existing configuration was kept.",
+      "invalid_selection": "Invalid gateway selection.",
+      "reconfigure_successful": "Local gateway connection updated."
+    }
+  }
+}
