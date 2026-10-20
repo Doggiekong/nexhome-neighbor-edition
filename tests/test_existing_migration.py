@@ -48,7 +48,7 @@ async def test_composite_messy_existing_ha(hass, gateway, tmp_path, old_minor):
     registry.async_update_entity(rows['userhidden'].entity_id, hidden_by=er.RegistryEntryHider.USER)
     registry.async_update_entity(rows['disabled'].entity_id, disabled_by=er.RegistryEntryDisabler.USER)
     registry.async_update_entity(rows['area'].entity_id, area_id=area.id)
-    wrapper = MockConfigEntry(domain='switch_as_x', data={'entity_id': rows['wrapper'].entity_id, 'target_domain': 'light'})
+    wrapper = MockConfigEntry(domain='switch_as_x', options={'entity_id': rows['wrapper'].entity_id, 'target_domain': 'light'})
     wrapper.add_to_hass(hass)
     manual = MockConfigEntry(domain='switch_as_x', data={'entity_id': rows['manual'].entity_id, 'target_domain': 'fan'})
     manual.add_to_hass(hass)

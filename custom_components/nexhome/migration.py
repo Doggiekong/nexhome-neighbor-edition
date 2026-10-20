@@ -95,9 +95,9 @@ def plan_compatibility(specs, rows, markers, wrappers=frozenset()):
 def related_wrappers(hass):
     """Only HA's explicit switch-as-X link is reliable; do not guess template names."""
     return frozenset(
-        e.data.get("entity_id")
+        e.options.get('entity_id', e.data.get('entity_id'))
         for e in hass.config_entries.async_entries("switch_as_x")
-        if isinstance(e.data.get("entity_id"), str)
+        if isinstance(e.options.get('entity_id', e.data.get('entity_id')), str)
     )
 
 
