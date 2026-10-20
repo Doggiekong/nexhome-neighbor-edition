@@ -2,7 +2,7 @@
 
 Status: **Architecture / Prototype Planning**。本文为未来实现的架构提案，不是已发布产品的安装说明。
 
-本文为持续维护的架构提案。当前项目处于 Architecture / Prototype Planning，仅整理文档与既有验证结论；正式 Installer、Community release 尚未发布。文中的组件、接口契约和阶段名称均为拟议设计，不代表已经开发或验收。
+本文为持续维护的总体架构提案。项目已在独立开发分支实现 Phase 1 Community integration Candidate，并通过离线 Review Gate；具体已实现范围见 [Review Gate](phase1-review-gate.md)。正式 Installer、Community release 尚未发布。文中超出 Phase 1 的组件、接口契约和阶段仍为拟议设计，不代表已开发或验收，也不代表 Candidate 已完成现场验证。
 
 **核心建议：一个统一入口，分离平台适配、NEXhome 核心集成、户型设置三层；先保证已有用户可回滚升级，再提供新用户免输入 Hub 参数的接入。** “零参数”指不要求填写 NEXhome IP/SN，不等于跳过 HA 管理员授权、宿主权限、首次账号创建或房间归属确认。
 

@@ -14,6 +14,8 @@
 
 另新增取消 command 后 pending/锁/队列计数清理与后续命令恢复测试。没有把 transient HTTP 故障伪装为成功，没有放宽 required freshness，没有改任何生产配置。
 
+文档复核同步修正 architecture/privacy 的历史“当前仅整理文档”状态说明：Phase 1 已有离线 Candidate，Installer/Profile 仍是规划；未来 installation-flow 继续明确不可当作当前安装教程。
+
 ## Review 覆盖结论
 
 | 范围 | 结论 |
