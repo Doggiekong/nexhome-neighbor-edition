@@ -122,7 +122,7 @@ def test_hacs_exclusive_owner(setup, repo, owner):
     root, _, engine, bundle = setup
     engine.apply(bundle)
     (root / '.nexhome-installer/owner.json').unlink()
-    (root / 'custom_components/hacs').mkdir()
+    write(root / 'custom_components/hacs/manifest.json', {'version': '2.0.5'})
     write(root / '.storage/hacs.repositories', {'data': {'repositories': {'1': {
         'domain': 'nexhome', 'installed': True, 'full_name': repo,
     }}}})
@@ -157,7 +157,7 @@ def test_conflicting_hacs_and_installer(setup):
     write(root / '.storage/hacs.repositories', {'data': {'1': {
         'domain': 'nexhome', 'installed': True, 'full_name': COMMUNITY,
     }}})
-    assert engine.inspect()['owner'] == Owner.MANUAL_UNKNOWN
+    assert engine.inspect()['owner'] == Owner.OWNERSHIP_CONFLICT
     with pytest.raises(InstallerError):
         engine.apply(bundle, manual_fingerprint=engine.inspect()['tree_sha256'])
 

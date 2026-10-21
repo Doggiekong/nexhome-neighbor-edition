@@ -6,6 +6,13 @@ Code restoration does not promise registry rollback.
 
 from .files import InstallerError, digest, load
 
+
+def transfer_identity(root, registry_view=None):
+    """Protect user identity; permit only HACS-owned update entities to churn."""
+    from .detection import identity_fingerprint
+    return digest({'user_identity': identity_fingerprint(root, exclude_hacs=True),
+                   'nexhome_identity': baseline(root, registry_view)})
+
 ENTITY_FIELDS = ('id', 'entity_id', 'unique_id', 'platform', 'name', 'original_name',
                  'hidden_by', 'disabled_by', 'area_id', 'device_id', 'icon', 'aliases', 'labels')
 DEVICE_FIELDS = ('id', 'identifiers', 'config_entries', 'name_by_user', 'area_id', 'disabled_by')

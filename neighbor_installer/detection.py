@@ -3,6 +3,7 @@
 from enum import StrEnum
 
 from .files import InstallerError, digest, guarded_root, inventory, load
+from .hacs import COMMUNITY, OFFICIAL, detect_hacs
 
 
 class Owner(StrEnum):
@@ -10,10 +11,25 @@ class Owner(StrEnum):
     COMMUNITY_HACS = "COMMUNITY_HACS"
     NEIGHBOR_INSTALLER = "NEIGHBOR_INSTALLER"
     MANUAL_UNKNOWN = "MANUAL_UNKNOWN"
+    OWNERSHIP_CONFLICT = "OWNERSHIP_CONFLICT"
 
 
-OFFICIAL = "nexhome-org/nexhome-homeassistant-component"
-COMMUNITY = "Doggiekong/nexhome-neighbor-edition"
+def _verified_marker(root, marker, files):
+    if not isinstance(marker, dict):
+        return False
+    identifier = marker.get('transaction_id', '')
+    if not isinstance(identifier, str) or len(identifier) != 32 or any(c not in '0123456789abcdef' for c in identifier):
+        return False
+    transaction = load(root / '.nexhome-installer/transactions' / identifier / 'record.json')
+    if not isinstance(transaction, dict) or not isinstance(transaction.get('artifact'), dict):
+        return False
+    artifact = transaction['artifact']
+    return (
+        marker.get('owner') == Owner.NEIGHBOR_INSTALLER and marker.get('files') == files
+        and transaction.get('id') == identifier and transaction.get('phase') == 'COMMITTED'
+        and artifact.get('files') == files and artifact.get('revision') == marker.get('revision')
+        and artifact.get('origin') == marker.get('origin')
+    )
 
 
 def detect(root, trusted_trees=None):
@@ -22,38 +38,32 @@ def detect(root, trusted_trees=None):
     files = inventory(target)
     exists = target.exists()
     fingerprint = digest(files)
-    hacs_present = (root / "custom_components/hacs").exists()
-    raw = load(root / ".storage/hacs.repositories")
-    claims = []
-    uncertain = raw is not None
-    # Read-only format adapter. Unknown schema/fields never establish ownership.
-    if isinstance(raw, dict) and isinstance(raw.get("data"), dict):
-        repositories = raw["data"].get("repositories", raw["data"])
-        if isinstance(repositories, dict):
-            uncertain = False
-            for repo in repositories.values():
-                if not isinstance(repo, dict):
-                    uncertain = True
-                    continue
-                if repo.get("domain") == "nexhome" and repo.get("installed") is True:
-                    claims.append(repo.get("full_name"))
+    hacs = detect_hacs(root)
+    hacs_present = hacs['present']
+    claims = [row['origin'] for row in hacs['claims']]
+    uncertain = hacs['uncertain']
     marker = load(root / ".nexhome-installer/owner.json")
     owner = None
     reason = "ABSENT"
     if claims:
         matched = len(claims) == 1 and (trusted_trees or {}).get(claims[0]) == fingerprint
-        if matched and not marker and not uncertain and hacs_present:
+        if marker or len(claims) > 1 or not exists or not hacs_present:
+            owner = Owner.OWNERSHIP_CONFLICT
+            reason = 'CONTRADICTORY_OWNER_EVIDENCE'
+        elif claims[0] in (trusted_trees or {}) and not matched:
+            owner = Owner.OWNERSHIP_CONFLICT
+            reason = 'HACS_SOURCE_TREE_DISAGREEMENT'
+        elif matched and not uncertain:
             owner = {OFFICIAL: Owner.OFFICIAL_HACS, COMMUNITY: Owner.COMMUNITY_HACS}.get(claims[0])
-        reason = "HACS_OWNER" if owner else "HACS_CONFLICT_OR_UNVERIFIED_TREE"
+            reason = 'HACS_OWNER' if owner else 'UNKNOWN_HACS_SOURCE'
+        else:
+            reason = 'HACS_UNVERIFIED_TREE'
     elif marker and not uncertain:
-        if (
-            marker.get("owner") == Owner.NEIGHBOR_INSTALLER
-            and marker.get("files") == files
-            and exists
-        ):
+        if exists and _verified_marker(root, marker, files):
             owner = Owner.NEIGHBOR_INSTALLER
             reason = "INSTALLER_MARKER_AND_HASHES"
         else:
+            owner = Owner.OWNERSHIP_CONFLICT
             reason = "MARKER_TREE_MISMATCH"
     elif exists or uncertain:
         reason = "UNVERIFIED_EXISTING_FILES_OR_HACS_SCHEMA"
@@ -81,10 +91,14 @@ def detect(root, trusted_trees=None):
     }
 
 
-def identity_fingerprint(root):
+def identity_fingerprint(root, *, exclude_hacs=False):
     """Do not save any registry contents or sensitive configuration values."""
     storage = root / ".storage"
     selected = {}
+    hacs_ids = set()
+    if exclude_hacs:
+        entries = load(storage / 'core.config_entries', {'data': {'entries': []}})['data']['entries']
+        hacs_ids = {row['entry_id'] for row in entries if row.get('domain') == 'hacs'}
     specifications = {
         "core.config_entries": ("entries", ("entry_id", "domain", "unique_id", "title", "disabled_by", "options")),
         "core.entity_registry": (
@@ -98,6 +112,16 @@ def identity_fingerprint(root):
     }
     for name, (collection, keys) in specifications.items():
         data = load(storage / name, {"data": {collection: []}}).get("data", {}).get(collection, [])
+        if exclude_hacs:
+            if name == 'core.config_entries':
+                data = [row for row in data if row.get('domain') != 'hacs']
+            elif name == 'core.entity_registry':
+                data = [row for row in data if row.get('platform') != 'hacs' and row.get('config_entry_id') not in hacs_ids]
+            elif name == 'core.device_registry':
+                def only_hacs(row):
+                    ids = set(row.get('config_entries') or ([row['config_entry_id']] if row.get('config_entry_id') else []))
+                    return bool(ids) and ids <= hacs_ids
+                data = [row for row in data if not only_hacs(row)]
         selected[name] = [{key: row.get(key) for key in keys} for row in data]
         if name == 'core.config_entries':
             for row, safe in zip(data, selected[name], strict=True):

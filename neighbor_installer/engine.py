@@ -10,6 +10,7 @@ from .artifact import Artifact
 from .detection import Owner, detect, identity_fingerprint
 from .files import InstallerError, copy_tree, durable, guarded_root, inventory, load, lock, remove_owned
 from .identity import baseline as migration_baseline
+from .identity import transfer_identity
 from .identity import validate as validate_migration
 
 TERMINAL = {"COMMITTED", "ROLLED_BACK"}
@@ -37,7 +38,11 @@ class Installer:
         durable(self.state / "transactions" / tx["id"] / "record.json", tx)
         durable(self.state / "active.json", {"id": tx["id"], "phase": phase})
 
-    def _pending(self):
+    def _pending(self, transfer_id=None):
+        transfer = load(self.state / 'transfer-active.json')
+        if transfer and transfer.get('phase') not in {'COMMITTED', 'CANCELLED'}:
+            if transfer.get('id') != transfer_id or transfer.get('phase') != 'DEPLOY':
+                raise InstallerError('PENDING_OWNER_TRANSFER')
         active = load(self.state / "active.json")
         if active and active.get("phase") not in TERMINAL:
             raise InstallerError("PENDING_TRANSACTION_USE_RECOVER")
@@ -67,11 +72,20 @@ class Installer:
         if retired.exists():
             remove_owned(retired, parent)
 
-    def apply(self, artifact: Artifact, *, manual_fingerprint=None, migration_preview=None):
+    def apply(self, artifact: Artifact, *, manual_fingerprint=None, migration_preview=None, transfer_id=None):
         with lock(self.root):
-            self._pending()
+            self._pending(transfer_id)
             artifact = artifact.revalidate()
+            if transfer_id:
+                handoff = load(self.state / 'transfers' / transfer_id / 'record.json')
+                if (not handoff or handoff.get('id') != transfer_id or handoff.get('phase') != 'DEPLOY'
+                        or handoff.get('artifact_manifest_sha256') != artifact.manifest_sha256
+                        or handoff.get('proposal', {}).get('destination') != Owner.NEIGHBOR_INSTALLER
+                        or transfer_identity(self.root, self._registry_view()) != handoff['proposal']['identity_sha256']):
+                    raise InstallerError('TRANSFER_HANDOFF_INVALID')
             detected = self.inspect()
+            if detected["owner"] == Owner.OWNERSHIP_CONFLICT:
+                raise InstallerError("OWNERSHIP_CONFLICT_REFUSED")
             if detected["owner"] in (Owner.OFFICIAL_HACS, Owner.COMMUNITY_HACS):
                 raise InstallerError("HACS_IS_UPDATE_OWNER")
             if detected["owner"] == Owner.MANUAL_UNKNOWN:
@@ -100,11 +114,13 @@ class Installer:
             tx = {
                 "id": uuid.uuid4().hex,
                 "artifact": artifact.metadata,
+                "identity_exclude_hacs": bool(transfer_id),
+                "ownership_transfer_id": transfer_id,
                 "artifact_manifest_sha256": artifact.manifest_sha256,
                 "before": {
                     "exists": self.target.exists(), "files": files, "detection": detected,
                     "owner_marker": load(self.state / "owner.json"),
-                    "identity_sha256": identity_fingerprint(self.root),
+                    "identity_sha256": identity_fingerprint(self.root, exclude_hacs=bool(transfer_id)),
                     "entry_states": probe.entry_states, "ha_version": probe.ha_version,
                     'migration_preview': migration_preview,
                 },
@@ -113,8 +129,11 @@ class Installer:
             try:
                 self._backup(tx)
                 artifact.revalidate()
-                if inventory(self.target) != files or identity_fingerprint(self.root) != tx["before"]["identity_sha256"]:
+                if inventory(self.target) != files or identity_fingerprint(self.root, exclude_hacs=tx.get("identity_exclude_hacs", False)) != tx["before"]["identity_sha256"]:
                     raise InstallerError("CONCURRENT_CHANGE_BEFORE_DEPLOY")
+                latest = self.inspect()
+                if latest['hacs_claim_count'] or latest['hacs_schema_uncertain'] or latest['owner'] == Owner.OWNERSHIP_CONFLICT:
+                    raise InstallerError('OWNER_CHANGED_BEFORE_DEPLOY')
                 self._record(tx, "DEPLOY")
                 self._swap(artifact.metadata["files"], artifact.directory / "nexhome", tx)
                 self._record(tx, "ACTIVATE")
@@ -126,8 +145,11 @@ class Installer:
                     raise InstallerError("POST_DEPLOY_HASH_MISMATCH")
                 if migration_preview:
                     tx['identity_result'] = validate_migration(self.root, migration_preview, self._registry_view())
-                elif identity_fingerprint(self.root) != tx["before"]["identity_sha256"]:
+                elif identity_fingerprint(self.root, exclude_hacs=tx.get("identity_exclude_hacs", False)) != tx["before"]["identity_sha256"]:
                     raise InstallerError("IDENTITY_CHANGED_REVIEW_REQUIRED")
+                latest = self.inspect()
+                if latest['hacs_claim_count'] or latest['hacs_schema_uncertain']:
+                    raise InstallerError('OWNER_CHANGED_DURING_ACTIVATION')
                 durable(self.state / "owner.json", {
                     "schema": 1, "owner": Owner.NEIGHBOR_INSTALLER, "files": artifact.metadata["files"],
                     "version": artifact.metadata["version"], "revision": artifact.metadata["revision"],
@@ -148,7 +170,17 @@ class Installer:
     def _restore(self, tx):
         original = tx["before"]
         directory = self.state / "transactions" / tx["id"]
+        detected = self.inspect()
+        if detected["hacs_claim_count"] or detected["hacs_schema_uncertain"]:
+            raise InstallerError("HACS_OWNERSHIP_PREVENTS_FILE_RECOVERY")
         try:
+            expected_marker = {
+                'schema': 1, 'owner': Owner.NEIGHBOR_INSTALLER, 'files': tx['artifact']['files'],
+                'version': tx['artifact']['version'], 'revision': tx['artifact']['revision'],
+                'origin': tx['artifact']['origin'], 'transaction_id': tx['id'],
+            }
+            if load(self.state / 'owner.json') not in (original['owner_marker'], expected_marker):
+                raise InstallerError('RECOVERY_OWNER_MARKER_CHANGED')
             current = inventory(self.target)
             if current not in (original["files"], tx["artifact"]["files"], {}):
                 raise InstallerError("RECOVERY_CONCURRENT_FILES_REFUSED")
@@ -182,7 +214,7 @@ class Installer:
                 raise InstallerError("ROLLBACK_HEALTH_FAILED")
             if inventory(self.target) != original["files"]:
                 raise InstallerError("RESTORE_HASH_MISMATCH")
-            identity_unchanged = identity_fingerprint(self.root) == original["identity_sha256"]
+            identity_unchanged = identity_fingerprint(self.root, exclude_hacs=tx.get("identity_exclude_hacs", False)) == original["identity_sha256"]
             if original.get('migration_preview'):
                 tx['identity_result'] = validate_migration(self.root, original['migration_preview'], self._registry_view())
                 # Even coherent additive metadata is not automatically reversed.
@@ -191,10 +223,23 @@ class Installer:
                     raise InstallerError('FORWARD_ONLY_REGISTRY_REVIEW_REQUIRED_CODE_RESTORED')
             if not identity_unchanged:
                 raise InstallerError('IDENTITY_REVIEW_REQUIRED_CODE_RESTORED')
+            if tx.get('ownership_transfer_id'):
+                tx['code_restored'] = True
+                raise InstallerError('SOURCE_OWNER_RECOVERY_REQUIRED_CODE_RESTORED')
             self._record(tx, "ROLLED_BACK")
             return {"status": "ROLLED_BACK", "transaction_id": tx["id"], "identity_unchanged": identity_unchanged}
         except Exception:
             self._record(tx, "RECOVERY_REQUIRED", "AUTOMATIC_RESTORE_NOT_CONFIRMED")
+            transfer_id = tx.get('ownership_transfer_id')
+            if (isinstance(transfer_id, str) and len(transfer_id) == 32
+                    and all(c in '0123456789abcdef' for c in transfer_id)):
+                path = self.state / 'transfers' / transfer_id / 'record.json'
+                handoff = load(path)
+                if isinstance(handoff, dict) and handoff.get('id') == transfer_id:
+                    handoff['phase'] = 'RECOVERY_REQUIRED'
+                    handoff.setdefault('history', []).append('RECOVERY_REQUIRED')
+                    durable(path, handoff)
+                    durable(self.state / 'transfer-active.json', {'id': transfer_id, 'phase': 'RECOVERY_REQUIRED'})
             raise InstallerError("RECOVERY_REQUIRED_BACKUP_PRESERVED") from None
 
     def recover(self):
