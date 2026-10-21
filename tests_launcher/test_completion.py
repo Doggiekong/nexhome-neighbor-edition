@@ -14,7 +14,7 @@ def test_deployed_not_ready_native_direct_link(lab):
     ui,_,_,_,_=lab
     view=install(ui)
     assert view['completion']['stage']=='DEPLOYED'
-    assert view['native_url']=='/config/integrations/dashboard?config_flow_start=nexhome'
+    assert view['native_url']=='/config/integrations/dashboard/add?domain=nexhome'
     assert not view['can_ack_ready']
     assert '安装完成' not in view['title']
     assert not ui.start('acknowledge_ready')

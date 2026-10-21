@@ -94,7 +94,7 @@ class Controller:
                 'technical': technical,
                 'component_current': detected.get('tree_sha256') == digest(self.artifact.metadata['files']),
                 'completion': self.state.get('completion', {'stage':'DEPLOYED'}),
-                'native_url': ('/config/integrations/dashboard?config_flow_start=nexhome' if detected.get('entry_count',0)==0 else '/config/integrations/integration/nexhome'),
+                'native_url': ('/config/integrations/dashboard/add?domain=nexhome' if detected.get('entry_count',0)==0 else '/config/integrations/integration/nexhome'),
                 'can_ack_ready': self.state.get('completion',{}).get('stage')=='CONTROL_VERIFIED',
                 'can_connect': screen == 'latest'}
 
