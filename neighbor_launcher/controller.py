@@ -6,7 +6,7 @@ import uuid
 from pathlib import Path
 
 from neighbor_installer.detection import Owner, identity_fingerprint
-from neighbor_installer.files import InstallerError, durable, load
+from neighbor_installer.files import InstallerError, digest, durable, load
 from neighbor_installer.identity import preview as migration_preview
 from neighbor_installer.product import artifact_identity, relation
 from neighbor_installer.transfer import Transfer
@@ -92,16 +92,22 @@ class Controller:
                 'plan': self.plan['id'] if self.plan else None,
                 'handoff_note': self.state.get('handoff_note'),
                 'technical': technical,
+                'component_current': detected.get('tree_sha256') == digest(self.artifact.metadata['files']),
+                'completion': self.state.get('completion', {'stage':'DEPLOYED'}),
+                'native_url': ('/config/integrations/dashboard?config_flow_start=nexhome' if detected.get('entry_count',0)==0 else '/config/integrations/integration/nexhome'),
+                'can_ack_ready': self.state.get('completion',{}).get('stage')=='CONTROL_VERIFIED',
                 'can_connect': screen == 'latest'}
 
     def start(self, action, payload=None):
         if not self.guard.acquire(blocking=False):
             return False
-        if not isinstance(action, str) or action not in {'check', 'prepare', 'confirm', 'cancel', 'handoff', 'recover'}:
+        if not isinstance(action, str) or action not in {'check', 'prepare', 'confirm', 'cancel', 'handoff', 'recover', 'check_setup', 'acknowledge_ready'}:
             self.guard.release()
             raise InstallerError('UI_ACTION_REFUSED')
         permitted = {
             'prepare': {'fresh', 'official', 'update'}, 'confirm': {'confirm'},
+            'check_setup': {'installed','latest','configured','ready'},
+            'acknowledge_ready': {'configured'},
             'cancel': {'confirm'}, 'handoff': {'handoff'}, 'recover': {'interrupted', 'recovery'},
         }
         if action in permitted and self.state['screen'] not in permitted[action]:
@@ -157,6 +163,8 @@ class Controller:
         else:
             screen = OWNER_SCREEN.get(detected['owner'], 'unknown')
         self._save(screen, status='IDLE', steps=[])
+        if screen == 'latest':
+            self._check_setup({})
 
     def _cancel(self, _payload):
         if self.state['screen'] != 'confirm':
@@ -202,10 +210,29 @@ class Controller:
         if result['status'] in {'COMMITTED', 'NO_OP'}:
             detected = self.engine.inspect()
             self._save('latest' if detected['entry_count'] else 'installed', status='DONE', detected=detected)
+            self._check_setup({})
         elif result['status'] == 'ROLLED_BACK':
             self._save('restored', status='DONE')
         else:
             self._save('recovery', status='WAITING')
+
+    def _check_setup(self, _payload):
+        detected = self.engine.inspect()
+        reader = getattr(self.engine.lifecycle, 'completion_status', None)
+        try:
+            evidence = reader() if reader else {'stage':'CONFIGURED' if detected['entry_count'] else 'DEPLOYED'}
+        except Exception:
+            evidence = {'stage':'UNCONFIRMED'}
+        screen = 'configured' if detected['entry_count'] else 'installed'
+        if evidence.get('stage') == 'CONTROL_VERIFIED' and self.state.get('user_knows_controls'):
+            screen = 'ready'
+        self._save(screen,status='IDLE',detected=detected,completion=evidence)
+
+    def _acknowledge_ready(self, _payload):
+        self._check_setup({})
+        if self.state.get('completion',{}).get('stage') != 'CONTROL_VERIFIED':
+            raise InstallerError('FIRST_CONTROL_NOT_VERIFIED')
+        self._save('ready',user_knows_controls=True,status='DONE')
 
     def _handoff(self, _payload):
         detected = self.engine.inspect()

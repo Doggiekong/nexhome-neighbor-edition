@@ -28,7 +28,9 @@
       <section id="recovery-help" class="guide" hidden><h2>先保留现在的状态</h2><p>请不要反复安装，也不要删除现有设备。保存下方诊断信息，和维护者一起确认恢复方法。</p><p>不需要发送密码或家庭网络资料。</p></section>
       <div class="actions"><button id="primary" type="button">开始检查</button><button id="connect" type="button" class="secondary" hidden>打开 Home Assistant</button><button id="recheck" type="button" class="secondary" hidden>重新检查</button><button id="cancel" type="button" class="secondary" hidden>返回</button></div>
       <a id="done-link" class="text-link" href="/config/integrations/integration/nexhome" target="_top" hidden>打开 Home Assistant ↗</a>
-      <p id="native-help" class="subtle" hidden>设置 → 设备与服务 → 添加集成 → NexHome。中控查找和确认都在 Home Assistant 中完成。安装助手可以停止。</p>
+      <button id="check-setup" class="secondary" type="button" hidden>检查连接与首次操作</button>
+      <button id="ack-ready" type="button" hidden>我已找到设备并完成首次操作</button>
+      <p id="native-help" class="subtle" hidden>点击“开始连接 NexHome”，直接进入 Home Assistant 的中控查找与确认。已有配置会沿用。只在入口失效时使用：设置 → 设备与服务 → 添加集成。</p>
       <button id="known-source" type="button" class="quiet" hidden>我知道这是怎么安装的</button>
       <p id="known-source-help" class="subtle" hidden>请先保存诊断信息，和维护者确认安装来源。本页不会直接覆盖。</p>
     </section>

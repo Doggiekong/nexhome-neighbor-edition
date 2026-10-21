@@ -16,7 +16,7 @@ def test_install_hands_off_to_native_ha(lab):
     ui, *_ = lab
     result = install(ui)
     assert result["screen"] == "installed"
-    assert result["button"] == "打开 Home Assistant"
+    assert result["button"] == "开始连接 NexHome"
     assert "Home Assistant" in result["description"]
     assert not result["can_connect"]
 

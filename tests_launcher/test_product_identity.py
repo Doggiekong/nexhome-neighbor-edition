@@ -40,7 +40,7 @@ def test_explicit_legacy_upgrade_and_noop(tmp_path, legacy):
     marker = load(engine.state / 'owner.json')
     assert marker['product_version'] == '0.1.0'
     assert marker['upstream_base_version'] == '1.1.16'
-    assert step(ui, 'check')['screen'] == 'latest'
+    assert step(ui, 'check')['screen'] == 'installed'
 
 
 def test_new_version_upgrade_downgrade_and_rollback(tmp_path):

@@ -19,6 +19,8 @@ class NexhomeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.selected = None
 
     async def async_step_user(self, user_input=None):
+        if self._async_current_entries() and self.source == "user":
+            return self.async_abort(reason="already_configured")
         self.hubs = await async_discover(self.hass)
         if not self.hubs:
             return await self.async_step_no_hubs()
@@ -94,7 +96,7 @@ class NexhomeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 if self.source == "reconfigure":
                     return self.async_update_reload_and_abort(entry, data_updates={IP_CONFIG: hub.endpoint})
                 return self.async_create_entry(
-                    title="NEXhome Community",
+                    title="NexHome 滨融府友邻加强版",
                     data={
                         IP_CONFIG: hub.endpoint,
                         SN_CONFIG: hub.serial,

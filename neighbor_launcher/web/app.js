@@ -6,7 +6,7 @@ const guide = [
   "打开右上角菜单，选择 Remove（移除）。如果提示已经配置，选择 IGNORE（保留现有配置并继续）。不要去删除 Home Assistant 中的 NexHome 设置。",
   "确认 REMOVE（移除）后返回这里，点击“我已经完成，重新检查”。我们会先核对，再继续安装。"
 ];
-const actions = {welcome:"check",fresh:"prepare",official:"prepare",update:"prepare",latest:"check",hacs:"check",confirm:"confirm",handoff:"handoff",installed:"native",interrupted:"recover",restored:"check",failed:"check",unhealthy:"check",connection_wait:"check"};
+const actions = {welcome:"check",fresh:"prepare",official:"prepare",update:"prepare",latest:"check",hacs:"check",confirm:"confirm",handoff:"handoff",installed:"native",configured:"native",ready:"native",interrupted:"recover",restored:"check",failed:"check",unhealthy:"check",connection_wait:"check"};
 function drawGuide(){
   $("guide-step").textContent = guide[guideStep];
   $("guide-step-count").textContent = `第 ${guideStep + 1} 步，共 ${guide.length} 步`;
@@ -27,8 +27,12 @@ function render(s){
   $("hacs-guide").hidden=s.screen!=="handoff"; drawGuide();
   $("recovery-help").hidden=s.screen!=="recovery";
   $("known-source").hidden=s.screen!=="unknown";
-  $("done-link").hidden=!["installed","latest"].includes(s.screen);
-  $("native-help").hidden=!["installed","latest"].includes(s.screen);
+  $("done-link").hidden=!["installed","latest","configured","ready"].includes(s.screen);
+  $("done-link").href=s.native_url;
+  $("done-link").textContent=s.screen==="installed"?"开始连接 NexHome ↗":"查看 NexHome 设备 ↗";
+  $("check-setup").hidden=!["installed","configured","ready"].includes(s.screen);
+  $("ack-ready").hidden=!s.can_ack_ready||s.screen==="ready";
+  $("native-help").hidden=!["installed","latest","configured","ready"].includes(s.screen);
   $("progress").replaceChildren(...s.steps.map(text=>{const li=document.createElement("li");li.textContent=text;return li;}));
   $("progress").hidden=!s.steps.length;
   $("diagnostic").textContent=JSON.stringify(s.technical,null,2);
@@ -50,7 +54,7 @@ async function poll(){
 }
 $("primary").addEventListener("click",async()=>{
   if(posting||!state||state.busy)return;
-  if(state.screen==="installed"){$("done-link").click();return;}
+  if(["installed","configured","ready"].includes(state.screen)){$("done-link").click();return;}
   const action=actions[state.screen];
   if(!action){if(state.screen==="recovery")$("recovery-help").hidden=false;$("technical").open=true;return;}
   posting=true;$("primary").disabled=true;
@@ -78,3 +82,17 @@ $("copy").addEventListener("click",async()=>{
   $("copy-status").textContent="当前浏览器不支持直接复制，已改为导出脱敏文件。";
 });
 poll();
+
+$("check-setup").addEventListener("click",()=>sendAction("check_setup"));
+$("ack-ready").addEventListener("click",()=>sendAction("acknowledge_ready"));
+
+async function sendAction(action){
+  if(posting||state?.busy)return;
+  posting=true;
+  try{
+    const response=await request("api/action",{method:"POST",headers:{"Content-Type":"application/json","X-Nexhome-Confirm":confirmation},body:JSON.stringify({action})});
+    if(![202,409].includes(response.status))throw Error("unavailable");
+    const current=await request("api/state");if(current.ok)render(await current.json());
+  }catch(_){$("notice").textContent="尚未确认，请稍后重新检查。";}
+  finally{posting=false;}
+}

@@ -154,3 +154,30 @@ class SupervisorLifecycle:
                 pass
             time.sleep(self.interval)
         return False
+
+
+    def completion_status(self):
+        """Read native integration evidence; unavailable proof never implies READY."""
+        async def read():
+            import aiohttp
+            url = ('ws://supervisor/core/websocket' if self._proxy_core else
+                   self._ha_url.replace('http://','ws://',1).replace('https://','wss://',1)+'/api/websocket')
+            trace = aiohttp.TraceConfig()
+            async def refuse_redirect(*_args):
+                raise InstallerError('AUTHENTICATED_REDIRECT_REFUSED')
+            trace.on_request_redirect.append(refuse_redirect)
+            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=12),trace_configs=[trace]) as session:
+                async with session.ws_connect(url) as ws:
+                    await ws.receive_json()
+                    await ws.send_json({'type':'auth','access_token':self._ha_token})
+                    if (await ws.receive_json()).get('type') != 'auth_ok':
+                        raise InstallerError('COMPLETION_AUTH_FAILED')
+                    await ws.send_json({'id':1,'type':'nexhome/installation_status'})
+                    while True:
+                        response=await ws.receive_json()
+                        if response.get('id') == 1:
+                            if not response.get('success'):
+                                return {'stage':'UNCONFIRMED'}
+                            result=response['result']
+                            return {k:result[k] for k in ('stage','configured_entries','loaded_entries','entities','available_entities','control_readback_verified') if k in result}
+        return asyncio.run(read())

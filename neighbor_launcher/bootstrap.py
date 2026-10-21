@@ -39,8 +39,8 @@ def _deploy(controller, *, confirm=False, handoff=False, output=print):
         view = step("handoff")
     else:
         view = step("check")
-        if view["screen"] == "latest":
-            return 0
+        if view.get("component_current") and view["screen"] in {"installed", "latest", "configured", "ready"}:
+            return _finish(controller, view, output)
         if view["screen"] not in {"fresh", "official", "update"}:
             return 2
         view = step("prepare")
@@ -50,10 +50,17 @@ def _deploy(controller, *, confirm=False, handoff=False, output=print):
             output("检查完成，尚未安装。确认备份及短暂重启后，使用 --confirm 再执行。")
             return 2
         view = step("confirm", plan=view["plan"], confirmed=True)
-    if view["screen"] in {"installed", "latest"}:
-        output("设置 → 设备与服务 → 添加集成 → NexHome 滨融府友邻加强版。后续在 Home Assistant 中完成。")
-        return 0
+    if view["screen"] in {"installed", "latest", "configured", "ready"}:
+        return _finish(controller, view, output)
     return 2
+
+
+def _finish(controller, view, output):
+    output("组件已部署，尚需在 Home Assistant 完成连接与首次操作。")
+    origin = getattr(controller.engine.lifecycle, '_ha_url', '').rstrip('/')
+    output(origin + view['native_url'])
+    output("已有配置会沿用；选择一盏灯操作并核对状态后，才算完成首次使用。")
+    return 0
 
 
 def deploy(controller, *, confirm=False, handoff=False, output=print):

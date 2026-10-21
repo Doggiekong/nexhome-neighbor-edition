@@ -5,18 +5,21 @@ import hashlib
 import logging
 from dataclasses import dataclass
 
+from homeassistant.components import websocket_api
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
+from homeassistant.setup import async_setup_component
 
 from .api import GatewayClient, validate_endpoint
 from .const import DOMAIN, IP_CONFIG, PLATFORMS, SN_CONFIG
 from .coordinator import GatewayCoordinator
 from .discovery import PushDispatcher
 from .errors import GatewayError
+from .installation import websocket_installation_status
 from .migration import plan_compatibility, related_wrappers
 from .models import descriptions
 
@@ -32,6 +35,12 @@ class Runtime:
     markers: dict
     store: Store
     gateway_key: str
+
+
+async def async_setup(hass, config):
+    await async_setup_component(hass, "websocket_api", {})
+    websocket_api.async_register_command(hass, websocket_installation_status)
+    return True
 
 
 async def async_migrate_entry(hass, entry):
@@ -101,6 +110,10 @@ async def async_setup_entry(hass, entry: ConfigEntry):
         if specs and not coordinator.values:
             raise ConfigEntryNotReady("No valid gateway properties available")
         entry.runtime_data = Runtime(client, coordinator, mode, plan, markers, store, key)
+        completion_store = Store(hass, 1, f"nexhome.installation.{entry.entry_id}")
+        proof = await completion_store.async_load()
+        entry.runtime_data.completion_store = completion_store
+        entry.runtime_data.completion_verified = isinstance(proof, dict) and proof.get("control_readback_verified") is True
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
         if entry.options.get("udp_refresh", True):
             async with root["push_lock"]:

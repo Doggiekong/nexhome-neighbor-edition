@@ -46,6 +46,7 @@ class GatewayCoordinator(DataUpdateCoordinator):
         self.push_tasks = {}
         self.missing_count = 0
         self.closed = False
+        self.confirmed_controls = 0
 
     def register(self, address, identifiers, *, required_groups=None):
         self.targets.setdefault(address, set()).update(identifiers)
@@ -182,6 +183,8 @@ class GatewayCoordinator(DataUpdateCoordinator):
                                 for k, c in zip(keys, commands)
                             )
                         if confirmed is True or confirmed is None:
+                            if confirmed is True:
+                                self.confirmed_controls += 1
                             return
                         if attempt + 1 < attempts:
                             delay = (

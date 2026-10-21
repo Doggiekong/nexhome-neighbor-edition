@@ -52,8 +52,8 @@ def test_d2_latest(lab):
     engine.apply(bundle)
     runtime.calls.clear()
     view = step(ui, 'check')
-    assert view['screen'] == 'latest'
-    assert '最新版' in view['title']
+    assert view['screen'] == 'installed'
+    assert '组件已部署' in view['title']
     assert runtime.calls == []
 
 
@@ -210,4 +210,4 @@ def test_old_official_schema_uses_stageb_policy_not_strict_false_failure(lab, ch
         write(root / '.storage/core.config_entries', entries)
     runtime.restart = restart
     view = step(ui, 'handoff')
-    assert view['screen'] == ('recovery' if change_wrapper else 'latest')
+    assert view['screen'] == ('recovery' if change_wrapper else 'configured')

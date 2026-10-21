@@ -59,7 +59,17 @@ class NexhomeEntity(CoordinatorEntity):
         return str(value) == "1" if value is not None else None
 
     async def send(self, commands, **kwargs):
+        before = self.coordinator.confirmed_controls
         await self.coordinator.command(self.spec.address, commands, **kwargs)
+        if self.coordinator.confirmed_controls > before and not getattr(self.runtime, 'completion_verified', False):
+            self.runtime.completion_verified = True
+            store = getattr(self.runtime, 'completion_store', None)
+            if store is not None:
+                try:
+                    await store.async_save({'control_readback_verified': True})
+                except OSError:
+                    # Evidence persistence must never turn a successful device command into failure.
+                    pass
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
