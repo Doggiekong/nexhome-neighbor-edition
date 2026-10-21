@@ -74,6 +74,11 @@ class Installer:
 
     def apply(self, artifact: Artifact, *, manual_fingerprint=None, migration_preview=None, transfer_id=None):
         with lock(self.root):
+            if transfer_id is not None and (
+                not isinstance(transfer_id, str) or len(transfer_id) != 32
+                or any(c not in '0123456789abcdef' for c in transfer_id)
+            ):
+                raise InstallerError('TRANSFER_ID_INVALID')
             self._pending(transfer_id)
             artifact = artifact.revalidate()
             if transfer_id:

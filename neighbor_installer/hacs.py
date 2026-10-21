@@ -17,6 +17,8 @@ def detect_hacs(root):
     raw = load(root / '.storage/hacs.repositories')
     fallback = load(root / '.storage/hacs.data')
     uncertain = False
+    if any(isinstance(item, dict) and item.get('version', 1) != 1 for item in (raw, fallback)):
+        uncertain = True
     rows = []
     if raw is not None and not (isinstance(raw, dict) and raw.get('data') == {}):
         data = raw.get('data') if isinstance(raw, dict) else None

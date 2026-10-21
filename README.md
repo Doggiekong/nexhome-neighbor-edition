@@ -1,10 +1,10 @@
 # NEXhome Neighbor Edition
 
-**Status: Phase 2 Stage B internal Candidate — 1.1.17.dev4**
+**Status: Phase 2 Stage C ownership validation complete with private-source limits — runtime 1.1.17.dev4**
 
-Stage B 的已有安装/混合用户定制迁移在隔离 HA 与 VM201 fake gateway 中验收；见[迁移报告](docs/phase2-stageb.md)。真实设备有限现场基线仍是 dev3，不把 dev4 的迁移测试描述为新的设备现场验收。尚未进入 HACS 渠道切换或生产部署。
+Stage B 的已有安装/混合用户定制迁移在隔离 HA 与 VM201 fake gateway 中验收；见[迁移报告](docs/phase2-stageb.md)。真实设备有限现场基线仍是 dev3，不把 dev4 的迁移测试描述为新的设备现场验收。Stage C 已加入唯一更新所有权、显式渠道移交 SDK 与离线验证；VM201 HACS onboarding 和 Official HACS → Installer 真实来源移交已通过；PRIVATE Community HACS 路径仅 fixture 验证。见[当前 Stage C 边界](docs/phase2-stagec.md)。未进入生产部署。
 
-为使用 NEXhome 的住户开发更稳定的 Home Assistant 接入方案。本分支包含 Community integration 候选代码和隔离离线测试，**未部署生产、未发布正式 Community Release、没有 Installer**。
+为使用 NEXhome 的住户开发更稳定的 Home Assistant 接入方案。本分支包含 Community integration 候选代码和隔离离线测试，**未部署生产、未发布正式 Community Release、只有内部 Installer 核心，尚无面向用户的 Launcher**。
 
 ## 希望解决的问题
 

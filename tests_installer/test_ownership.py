@@ -314,3 +314,16 @@ def test_unknown_hacs_version_cannot_establish_trusted_owner(setup, repo):
     assert engine.inspect()['owner'] == Owner.MANUAL_UNKNOWN
     with pytest.raises(InstallerError):
         engine.apply(bundle, manual_fingerprint=engine.inspect()['tree_sha256'])
+
+
+def test_transfer_identifier_is_bounded_before_file_lookup(setup):
+    _, runtime, engine, bundle = setup
+    with pytest.raises(InstallerError, match='TRANSFER_ID_INVALID'):
+        engine.apply(bundle, transfer_id='../../other')
+    assert runtime.calls == []
+
+
+def test_unknown_storage_version_fails_closed(setup):
+    root, _, engine, _ = setup
+    write(root / '.storage/hacs.repositories', {'version': 999, 'data': {}})
+    assert engine.inspect()['hacs_schema_uncertain']
