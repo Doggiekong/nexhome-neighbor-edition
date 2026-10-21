@@ -23,6 +23,8 @@ def _deploy(controller, *, confirm=False, handoff=False, output=print):
             raise InstallerError("BOOTSTRAP_OPERATION_ALREADY_RUNNING")
         controller.worker.join()
         view = controller.view()
+        if view.get("upstream_base_version"):
+            output("友邻加强版 " + view["product_version"] + "；基于官方组件 " + view["upstream_base_version"])
         output(view["title"])
         output(view["description"])
         return view
@@ -49,7 +51,7 @@ def _deploy(controller, *, confirm=False, handoff=False, output=print):
             return 2
         view = step("confirm", plan=view["plan"], confirmed=True)
     if view["screen"] in {"installed", "latest"}:
-        output("设置 → 设备与服务 → 添加集成 → NexHome。后续在 Home Assistant 中完成。")
+        output("设置 → 设备与服务 → 添加集成 → NexHome 滨融府友邻加强版。后续在 Home Assistant 中完成。")
         return 0
     return 2
 

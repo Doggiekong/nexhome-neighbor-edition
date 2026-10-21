@@ -20,6 +20,7 @@ function render(s){
   $("cancel").hidden=s.screen!=="confirm";
   $("recheck").hidden=!["unknown","conflict"].includes(s.screen);
   $("connect").hidden=!s.can_connect; $("connect").disabled=s.busy||posting;
+  $("product-identity").textContent=s.upstream_base_version?`友邻加强版 ${s.product_version} · 基于官方组件 ${s.upstream_base_version}`:"";
   $("versions").hidden=s.screen!=="update";
   $("current-version").textContent=s.current_version||"—"; $("new-version").textContent=s.new_version||"—";
   $("notice").textContent=s.handoff_note||(s.screen==="hacs"?"HACS 是 Home Assistant 常用的扩展安装工具。":"");

@@ -63,7 +63,7 @@ def test_d3_update(lab, tmp_path):
     ui.artifact = artifact(tmp_path, '1.1.17.dev4')
     view = step(ui, 'check')
     assert view['screen'] == 'update'
-    assert view['current_version'] == '1.1.17.dev3'
+    assert view['current_version'] == '早期内部 Candidate'
     assert view['new_version'] == '1.1.17.dev4'
     assert install(ui)['screen'] == 'installed'
     assert engine.inspect()['version'] == '1.1.17.dev4'

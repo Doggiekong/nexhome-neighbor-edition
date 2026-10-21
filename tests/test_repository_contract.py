@@ -50,7 +50,7 @@ async def test_all_catalog_models_handle_absent_properties(coordinator, type_id)
 
 def test_manifest_version_json_and_no_debug_print():
     manifest = json.loads((ROOT / "custom_components/nexhome/manifest.json").read_text())
-    assert manifest["version"] == VERSION and Version(VERSION).is_devrelease
+    assert manifest["version"] == VERSION == "0.1.0" and Version(VERSION).release == (0, 1, 0)
     assert manifest["domain"] == "nexhome" and manifest["config_flow"]
     assert manifest["requirements"] == [] and manifest["dependencies"] == ["network"]
     for path in (ROOT / "custom_components").rglob("*.json"):

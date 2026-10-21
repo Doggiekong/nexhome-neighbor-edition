@@ -8,7 +8,8 @@ import tarfile
 from pathlib import Path, PurePosixPath
 
 from .artifact import Artifact
-from .files import InstallerError, durable, inventory
+from .files import InstallerError, durable, inventory, load
+from .product import validate_identity
 
 
 def build(repo, revision, output, ha_versions):
@@ -35,8 +36,10 @@ def build(repo, revision, output, ha_versions):
             target.write_bytes(archive.extractfile(member).read())
     import json
     manifest = json.loads((output / 'nexhome/manifest.json').read_text(encoding='utf-8'))
+    info = load(output / 'nexhome/product.json')
+    identity = validate_identity(info, manifest['version']) if info is not None else {}
     durable(output / 'artifact.json', {
-        'schema': 1, 'version': manifest['version'], 'revision': commit,
+        **identity, 'schema': 2 if identity else 1, 'version': manifest['version'], 'revision': commit,
         'origin': 'https://github.com/Doggiekong/nexhome-neighbor-edition',
         'tested_ha_versions': ha_versions, 'files': inventory(output / 'nexhome'),
     })

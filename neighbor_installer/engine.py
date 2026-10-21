@@ -4,14 +4,13 @@ import os
 import uuid
 from datetime import UTC, datetime
 
-from packaging.version import Version
-
 from .artifact import Artifact
 from .detection import Owner, detect, identity_fingerprint
 from .files import InstallerError, copy_tree, durable, guarded_root, inventory, load, lock, remove_owned
 from .identity import baseline as migration_baseline
 from .identity import transfer_identity
 from .identity import validate as validate_migration
+from .product import artifact_identity, relation
 
 TERMINAL = {"COMMITTED", "ROLLED_BACK"}
 
@@ -113,9 +112,10 @@ class Installer:
             if detected["owner"] == Owner.NEIGHBOR_INSTALLER and files == artifact.metadata["files"]:
                 return {"status": "NO_OP", "version": artifact.metadata["version"], "owner": Owner.NEIGHBOR_INSTALLER}
             if detected["owner"] == Owner.NEIGHBOR_INSTALLER and detected["version"]:
-                if Version(artifact.metadata['version']) == Version(detected['version']):
+                comparison = relation(detected, artifact.metadata)
+                if comparison == 'same':
                     raise InstallerError('SAME_VERSION_DIFFERENT_FILES_REFUSED')
-                if Version(artifact.metadata["version"]) < Version(detected["version"]):
+                if comparison == 'downgrade':
                     raise InstallerError("DOWNGRADE_REFUSED")
             probe = self.lifecycle.probe()
             if not probe.running or not probe.healthy:
@@ -166,6 +166,7 @@ class Installer:
                 if latest['hacs_claim_count'] or latest['hacs_schema_uncertain']:
                     raise InstallerError('OWNER_CHANGED_DURING_ACTIVATION')
                 durable(self.state / "owner.json", {
+                    **artifact_identity(artifact.metadata),
                     "schema": 1, "owner": Owner.NEIGHBOR_INSTALLER, "files": artifact.metadata["files"],
                     "version": artifact.metadata["version"], "revision": artifact.metadata["revision"],
                     "origin": artifact.metadata["origin"], "transaction_id": tx["id"],
@@ -190,6 +191,7 @@ class Installer:
             raise InstallerError("HACS_OWNERSHIP_PREVENTS_FILE_RECOVERY")
         try:
             expected_marker = {
+                **artifact_identity(tx['artifact']),
                 'schema': 1, 'owner': Owner.NEIGHBOR_INSTALLER, 'files': tx['artifact']['files'],
                 'version': tx['artifact']['version'], 'revision': tx['artifact']['revision'],
                 'origin': tx['artifact']['origin'], 'transaction_id': tx['id'],

@@ -4,13 +4,14 @@ from collections import Counter
 
 from homeassistant.const import __version__ as HA_VERSION
 
-from .const import VERSION
+from .const import PRODUCT_ID, PRODUCT_VERSION, UPSTREAM_BASE_VERSION, VERSION
 from .models import model_status
 
 
 async def async_get_config_entry_diagnostics(hass, entry):
     runtime = getattr(entry, "runtime_data", None)
-    result = {"ha_version": HA_VERSION, "integration_version": VERSION, "entry_state": entry.state.value}
+    result = {"product_id": PRODUCT_ID, "product_version": PRODUCT_VERSION,
+              "upstream_base_version": UPSTREAM_BASE_VERSION, "ha_version": HA_VERSION, "integration_version": VERSION, "entry_state": entry.state.value}
     if runtime is None:
         return result | {"runtime_available": False}
     coordinator = runtime.coordinator

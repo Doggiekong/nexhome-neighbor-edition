@@ -58,6 +58,8 @@ async def test_real_ha_setup_reload_no_duplicate_and_no_diagnostics_secrets(hass
             r.entity_id.split(".")[0] for r in er.async_entries_for_config_entry(registry, entry.entry_id)
         } == {"light", "fan", "climate", "cover", "sensor"}
         diag = await async_get_config_entry_diagnostics(hass, entry)
+        assert diag["product_version"] == "0.1.0"
+        assert diag["upstream_base_version"] == "1.1.16"
         encoded = str(diag)
         for sensitive in [
             "synthetic-gateway",

@@ -4,6 +4,7 @@ from enum import StrEnum
 
 from .files import InstallerError, digest, guarded_root, inventory, load
 from .hacs import COMMUNITY, OFFICIAL, detect_hacs
+from .product import artifact_identity, installed_identity
 
 
 class Owner(StrEnum):
@@ -26,6 +27,8 @@ def _verified_marker(root, marker, files):
     artifact = transaction['artifact']
     return (
         marker.get('owner') == Owner.NEIGHBOR_INSTALLER and marker.get('files') == files
+        and marker.get('version') == artifact.get('version')
+        and all(marker.get(k) == v for k, v in artifact_identity(artifact).items())
         and transaction.get('id') == identifier and transaction.get('phase') == 'COMMITTED'
         and artifact.get('files') == files and artifact.get('revision') == marker.get('revision')
         and artifact.get('origin') == marker.get('origin')
@@ -76,6 +79,7 @@ def detect(root, trusted_trees=None):
     nexhome = [row for row in rows if row.get("domain") == "nexhome"]
     manifest = load(target / "manifest.json", {}) if exists else {}
     return {
+        **(installed_identity(target, owner) if exists and owner in {Owner.NEIGHBOR_INSTALLER, Owner.COMMUNITY_HACS} else {}),
         "installed": exists,
         "version": manifest.get("version"),
         "owner": owner,

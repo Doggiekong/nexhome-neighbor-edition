@@ -9,6 +9,7 @@ from pathlib import Path, PurePosixPath
 from packaging.version import InvalidVersion, Version
 
 from .files import InstallerError, inventory, load
+from .product import FIELDS, validate_identity
 
 
 @dataclass(frozen=True)
@@ -29,11 +30,14 @@ class Artifact:
         if not expected_sha256 or actual != expected_sha256:
             raise InstallerError("ARTIFACT_PIN_MISMATCH")
         metadata = load(manifest)
-        if not isinstance(metadata, dict) or set(metadata) != {
+        if not isinstance(metadata, dict):
+            raise InstallerError('ARTIFACT_METADATA_INVALID')
+        extra = set(FIELDS) if metadata.get('schema') == 2 else set()
+        if set(metadata) != extra | {
             'schema', 'version', 'revision', 'origin', 'tested_ha_versions', 'files'
         }:
             raise InstallerError('ARTIFACT_METADATA_INVALID')
-        if metadata.get("schema") != 1 or not all(
+        if metadata.get("schema") not in (1, 2) or not all(
             isinstance(metadata.get(key), str) and 0 < len(metadata[key]) <= 256
             for key in ("version", "revision", "origin")
         ):
@@ -64,6 +68,12 @@ class Artifact:
         manifest_data = load(directory / "nexhome/manifest.json")
         if manifest_data.get("domain") != "nexhome" or manifest_data.get("version") != metadata["version"]:
             raise InstallerError("ARTIFACT_INTEGRATION_INVALID")
+        if metadata['schema'] == 2:
+            info = validate_identity({k: metadata[k] for k in FIELDS}, metadata['version'])
+            if load(directory / 'nexhome/product.json') != info:
+                raise InstallerError('ARTIFACT_PRODUCT_MISMATCH')
+        if metadata['schema'] == 1 and 'product.json' in files:
+            raise InstallerError('ARTIFACT_PRODUCT_SCHEMA_REQUIRED')
         for name in files:
             if name.endswith(".py"):
                 try:

@@ -5,11 +5,10 @@ import threading
 import uuid
 from pathlib import Path
 
-from packaging.version import Version
-
 from neighbor_installer.detection import Owner, identity_fingerprint
 from neighbor_installer.files import InstallerError, durable, load
 from neighbor_installer.identity import preview as migration_preview
+from neighbor_installer.product import artifact_identity, relation
 from neighbor_installer.transfer import Transfer
 from neighbor_installer.update import apply_update, preview_update
 
@@ -76,6 +75,8 @@ class Controller:
             'owner', 'reason', 'version', 'tree_sha256', 'hacs_present', 'entry_count'
         ) if k in detected}
         technical.update({'ha_version': self.state.get('ha_version'),
+                          **artifact_identity(self.artifact.metadata),
+                          'build_commit': self.artifact.metadata['revision'],
                           'candidate_version': self.artifact.metadata['version'],
                           'artifact_manifest_sha256': self.artifact.manifest_sha256,
                           'source': self.artifact.metadata['origin'],
@@ -84,7 +85,10 @@ class Controller:
         return {'screen': screen, 'title': title, 'description': description, 'button': button,
                 'busy': self.state.get('status') == 'RUNNING',
                 'steps': [PHASE_LABELS[x] for x in self.state.get('steps', []) if x in PHASE_LABELS],
-                'current_version': detected.get('version'), 'new_version': self.artifact.metadata['version'],
+                'product_version': self.artifact.metadata.get('product_version', self.artifact.metadata['version']),
+                'upstream_base_version': self.artifact.metadata.get('upstream_base_version'),
+                'current_version': ('早期内部 Candidate' if detected.get('version') in {'1.1.17.dev1', '1.1.17.dev2', '1.1.17.dev3', '1.1.17.dev4'} else detected.get('version')),
+                'new_version': self.artifact.metadata['version'],
                 'plan': self.plan['id'] if self.plan else None,
                 'handoff_note': self.state.get('handoff_note'),
                 'technical': technical,
@@ -148,7 +152,8 @@ class Controller:
         elif any(value not in {'loaded', 'not_loaded'} for value in probe.entry_states.values()):
             screen = 'connection_wait'
         elif detected['owner'] == Owner.NEIGHBOR_INSTALLER:
-            screen = 'update' if Version(detected['version']) < Version(self.artifact.metadata['version']) else 'latest'
+            comparison = relation(detected, self.artifact.metadata)
+            screen = 'update' if comparison == 'upgrade' else 'latest' if comparison == 'same' else 'unsupported'
         else:
             screen = OWNER_SCREEN.get(detected['owner'], 'unknown')
         self._save(screen, status='IDLE', steps=[])
