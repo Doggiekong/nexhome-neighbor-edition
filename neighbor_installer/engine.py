@@ -17,12 +17,21 @@ TERMINAL = {"COMMITTED", "ROLLED_BACK"}
 
 
 class Installer:
-    def __init__(self, root, lifecycle, *, trusted_trees=None):
+    def __init__(self, root, lifecycle, *, trusted_trees=None, observer=None):
         self.root = guarded_root(root)
         self.target = self.root / "custom_components/nexhome"
         self.state = self.root / ".nexhome-installer"
         self.lifecycle = lifecycle
         self.trusted_trees = trusted_trees
+        self.observer = observer
+
+    def notify(self, identifier, phase, kind='deployment'):
+        """Best-effort UI observation cannot change transaction outcomes."""
+        if self.observer:
+            try:
+                self.observer({'id': identifier, 'phase': phase, 'kind': kind})
+            except Exception:
+                pass
 
     def inspect(self):
         return detect(self.root, self.trusted_trees)
@@ -37,6 +46,7 @@ class Installer:
             tx["error"] = error
         durable(self.state / "transactions" / tx["id"] / "record.json", tx)
         durable(self.state / "active.json", {"id": tx["id"], "phase": phase})
+        self.notify(tx['id'], phase)
 
     def _pending(self, transfer_id=None):
         transfer = load(self.state / 'transfer-active.json')

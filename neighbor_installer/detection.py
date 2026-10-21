@@ -91,14 +91,15 @@ def detect(root, trusted_trees=None):
     }
 
 
-def identity_fingerprint(root, *, exclude_hacs=False):
+def identity_fingerprint(root, *, exclude_hacs=False, exclude_nexhome=False):
     """Do not save any registry contents or sensitive configuration values."""
     storage = root / ".storage"
     selected = {}
-    hacs_ids = set()
-    if exclude_hacs:
+    excluded_domains = ({'hacs'} if exclude_hacs else set()) | ({'nexhome'} if exclude_nexhome else set())
+    excluded_ids = set()
+    if excluded_domains:
         entries = load(storage / 'core.config_entries', {'data': {'entries': []}})['data']['entries']
-        hacs_ids = {row['entry_id'] for row in entries if row.get('domain') == 'hacs'}
+        excluded_ids = {row['entry_id'] for row in entries if row.get('domain') in excluded_domains}
     specifications = {
         "core.config_entries": ("entries", ("entry_id", "domain", "unique_id", "title", "disabled_by", "options")),
         "core.entity_registry": (
@@ -112,15 +113,15 @@ def identity_fingerprint(root, *, exclude_hacs=False):
     }
     for name, (collection, keys) in specifications.items():
         data = load(storage / name, {"data": {collection: []}}).get("data", {}).get(collection, [])
-        if exclude_hacs:
+        if excluded_domains:
             if name == 'core.config_entries':
-                data = [row for row in data if row.get('domain') != 'hacs']
+                data = [row for row in data if row.get('domain') not in excluded_domains]
             elif name == 'core.entity_registry':
-                data = [row for row in data if row.get('platform') != 'hacs' and row.get('config_entry_id') not in hacs_ids]
+                data = [row for row in data if row.get('platform') not in excluded_domains and row.get('config_entry_id') not in excluded_ids]
             elif name == 'core.device_registry':
                 def only_hacs(row):
                     ids = set(row.get('config_entries') or ([row['config_entry_id']] if row.get('config_entry_id') else []))
-                    return bool(ids) and ids <= hacs_ids
+                    return bool(ids) and ids <= excluded_ids
                 data = [row for row in data if not only_hacs(row)]
         selected[name] = [{key: row.get(key) for key in keys} for row in data]
         if name == 'core.config_entries':

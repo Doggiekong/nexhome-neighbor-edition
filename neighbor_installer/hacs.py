@@ -17,7 +17,9 @@ def detect_hacs(root):
     raw = load(root / '.storage/hacs.repositories')
     fallback = load(root / '.storage/hacs.data')
     uncertain = False
-    if any(isinstance(item, dict) and item.get('version', 1) != 1 for item in (raw, fallback)):
+    # HACS 2.0.5 const.VERSION_STORAGE is the string '6', not HA's usual integer 1.
+    supported_versions = (1, '6') if manifest.get('version') == '2.0.5' else (1,)
+    if any(isinstance(item, dict) and item.get('version', 1) not in supported_versions for item in (raw, fallback)):
         uncertain = True
     rows = []
     if raw is not None and not (isinstance(raw, dict) and raw.get('data') == {}):

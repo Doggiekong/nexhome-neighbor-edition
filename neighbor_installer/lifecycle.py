@@ -28,11 +28,12 @@ class Probe:
 class SupervisorLifecycle:
     """Run in an authorized companion outside Core, not inside restarting Core."""
 
-    def __init__(self, token, *, ha_token=None, ha_url='http://homeassistant:80', timeout=150, interval=2):
+    def __init__(self, token, *, ha_token=None, ha_url='http://homeassistant:80', timeout=150, interval=2, proxy_core=False):
         if not token:
             raise InstallerError("SUPERVISOR_AUTH_REQUIRED")
         self._token = token
-        self._ha_token = ha_token
+        self._proxy_core = proxy_core
+        self._ha_token = token if proxy_core else ha_token
         self._ha_url = ha_url.rstrip('/')
         parsed = urllib.parse.urlsplit(self._ha_url)
         if parsed.scheme not in {'http', 'https'} or not parsed.hostname or parsed.username or parsed.password or (
@@ -47,7 +48,8 @@ class SupervisorLifecycle:
         core_api = path.startswith('/core/api/')
         if core_api and not self._ha_token:
             raise InstallerError('HA_AUTH_REQUIRED')
-        url = self._ha_url + path.removeprefix('/core') if core_api else 'http://supervisor' + path
+        url = (self._ha_url + path.removeprefix('/core')
+               if core_api and not self._proxy_core else 'http://supervisor' + path)
         request = urllib.request.Request(
             url,
             data=b"{}" if method == "POST" else None,
@@ -78,7 +80,8 @@ class SupervisorLifecycle:
         """Read supported live HA registries; disk may lag scheduled Store writes."""
         async def read():
             import aiohttp
-            url = self._ha_url.replace('http://', 'ws://', 1).replace('https://', 'wss://', 1) + '/api/websocket'
+            url = ('ws://supervisor/core/websocket' if self._proxy_core else
+                   self._ha_url.replace('http://', 'ws://', 1).replace('https://', 'wss://', 1) + '/api/websocket')
             trace = aiohttp.TraceConfig()
             async def refuse_redirect(*args):
                 raise InstallerError('AUTHENTICATED_REDIRECT_REFUSED')

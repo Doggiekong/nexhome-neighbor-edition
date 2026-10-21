@@ -8,7 +8,8 @@ import uuid
 
 from .detection import Owner
 from .files import InstallerError, copy_tree, digest, durable, inventory, load, lock
-from .identity import transfer_identity
+from .identity import transfer_context, transfer_identity
+from .identity import validate as validate_migration
 from .ownership import verify_post_migration_state
 
 TERMINAL = {'COMMITTED', 'CANCELLED'}
@@ -35,6 +36,7 @@ class Transfer:
         record.setdefault('history', []).append(phase)
         durable(self.state / 'transfers' / record['id'] / 'record.json', record)
         durable(self.state / 'transfer-active.json', {'id': record['id'], 'phase': phase})
+        self.installer.notify(record['id'], phase, 'transfer')
 
     def _load(self):
         active = load(self.state / 'transfer-active.json')
@@ -54,6 +56,7 @@ class Transfer:
             raise InstallerError('HACS_SCHEMA_UNCERTAIN')
         proposal = {'schema': 1, 'before': before, 'destination': destination,
                     'identity_sha256': self._identity(),
+                    'external_identity_sha256': transfer_context(self.root),
                     'hacs_ui_step_required': before['hacs_claim_count'] > 0 or destination == Owner.COMMUNITY_HACS,
                     'rollback': 'RECOVERY_REQUIRED_AFTER_EXTERNAL_SOURCE_CHANGE'}
         proposal['confirmation_sha256'] = digest(proposal)
@@ -129,6 +132,7 @@ class Transfer:
             if self._identity() != record['proposal']['identity_sha256']:
                 raise InstallerError('TRANSFER_IDENTITY_CHANGED')
             record['artifact_manifest_sha256'] = artifact.manifest_sha256
+            record['migration_preview'] = migration_preview
             self._save(record, 'DEPLOY')
         # Engine takes the same lock and validates this exact handoff identifier.
         try:
@@ -167,7 +171,12 @@ class Transfer:
                 if not probe.running or not probe.healthy:
                     raise InstallerError('TRANSFER_HEALTH_FAILED')
                 verify_post_migration_state(self.installer.inspect(), record['proposal']['destination'])
-                if self._identity() != record['proposal']['identity_sha256']:
+                if record.get('migration_preview'):
+                    record['identity_result'] = validate_migration(
+                        self.root, record['migration_preview'], self.installer._registry_view())
+                    if transfer_context(self.root) != record['proposal']['external_identity_sha256']:
+                        raise InstallerError('TRANSFER_EXTERNAL_IDENTITY_CHANGED')
+                elif self._identity() != record['proposal']['identity_sha256']:
                     raise InstallerError('TRANSFER_IDENTITY_REVIEW_REQUIRED')
                 self._save(record, 'VERIFY_OWNER')
                 self._save(record, 'COMMITTED')

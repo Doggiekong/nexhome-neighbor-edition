@@ -13,6 +13,16 @@ def transfer_identity(root, registry_view=None):
     return digest({'user_identity': identity_fingerprint(root, exclude_hacs=True),
                    'nexhome_identity': baseline(root, registry_view)})
 
+
+def transfer_context(root):
+    """Unrelated user intent stays exact when approved Nx metadata is additive."""
+    from .detection import identity_fingerprint
+    entries = load(root / '.storage/core.config_entries', {'data': {'entries': []}})['data']['entries']
+    wrappers = {e['entry_id']: {'data': digest(e.get('data', {})), 'options': digest(e.get('options', {}))}
+                for e in entries if e.get('domain') == 'switch_as_x'}
+    return digest({'unrelated': identity_fingerprint(root, exclude_hacs=True, exclude_nexhome=True),
+                   'wrappers': wrappers})
+
 ENTITY_FIELDS = ('id', 'entity_id', 'unique_id', 'platform', 'name', 'original_name',
                  'hidden_by', 'disabled_by', 'area_id', 'device_id', 'icon', 'aliases', 'labels')
 DEVICE_FIELDS = ('id', 'identifiers', 'config_entries', 'name_by_user', 'area_id', 'disabled_by')
