@@ -45,3 +45,17 @@ def test_no_evidence_no_claim(lab):
     runtime.completion_status=fail
     view=step(ui,'check_setup')
     assert not view['can_ack_ready'] and view['completion']['stage']=='UNCONFIRMED'
+
+
+def test_terminal_completion_requires_explicit_proof(lab):
+    from neighbor_launcher.bootstrap import verify_completion
+    from tests_installer.test_installer import write
+    ui,root,runtime,_,_=lab
+    write(root/'.storage/core.config_entries',{'data':{'entries':[{'domain':'nexhome','entry_id':'fixture','data':{}}]}})
+    install(ui)
+    runtime.completion_status=lambda:{'stage':'CONFIGURED'}
+    assert verify_completion(ui,output=lambda *_:None)==2
+    runtime.completion_status=lambda:{'stage':'CONTROL_VERIFIED'}
+    assert verify_completion(ui,output=lambda *_:None)==0
+    assert ui.view()['screen']=='ready'
+    assert verify_completion(ui,output=lambda *_:None)==0

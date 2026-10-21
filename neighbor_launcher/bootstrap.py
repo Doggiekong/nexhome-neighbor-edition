@@ -80,6 +80,30 @@ def deploy(controller, *, confirm=False, handoff=False, output=print):
         controller.engine.observer = prior
 
 
+def verify_completion(controller, *, output=print):
+    """Explicit user acknowledgement; read-only proof check, never a device command."""
+    for action in ('check', 'check_setup'):
+        if not controller.start(action):
+            return 2
+        controller.worker.join()
+        if controller.view()['screen'] not in {'installed','configured','ready'}:
+            output("尚未确认连接，请保留现状并检查 Home Assistant。")
+            return 2
+    if controller.view()['completion'].get('stage') != 'CONTROL_VERIFIED':
+        output("设备可见和首次控制读回尚未全部确认，不标记安装完成。")
+        return 2
+    if controller.view()['screen']=='ready':
+        output(controller.view()['title'])
+        return 0
+    if not controller.start('acknowledge_ready'):
+        return 2
+    controller.worker.join()
+    view=controller.view()
+    output(view['title'])
+    output(view['description'])
+    return 0 if view['screen']=='ready' else 2
+
+
 def read_private_token(path):
     descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
     with os.fdopen(descriptor) as stream:
@@ -101,6 +125,7 @@ def main():
     parser.add_argument("--token-file", help="仅 Container：当前用户专有的临时授权文件；用后自行撤销并删除")
     parser.add_argument("--confirm", action="store_true")
     parser.add_argument("--hacs-completed", action="store_true")
+    parser.add_argument("--verify-completion", action="store_true", help="确认已找到设备并完成首次操作；只检查证据，不发送控制")
     args = parser.parse_args()
     try:
         package = Path(args.package).resolve()
@@ -118,6 +143,8 @@ def main():
             runtime = SupervisorLifecycle(os.environ.get("SUPERVISOR_TOKEN"), proxy_core=True, timeout=210)
         engine = Installer(args.config, runtime, trusted_trees=load(package / "trusted-trees.json", {}))
         controller = Controller(engine, artifact, engine.state / "bootstrap-ui")
+        if args.verify_completion:
+            return verify_completion(controller)
         return deploy(controller, confirm=args.confirm, handoff=args.hacs_completed)
     except Exception as error:
         print("这一步没有完成，请保留现状。未确认来源的安装不会被覆盖。")
