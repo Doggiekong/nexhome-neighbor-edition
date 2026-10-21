@@ -1,5 +1,8 @@
 # 隐私与安全：让您放心地本地接入
 
+> 当前产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
+
+
 **当前状态：Community Candidate 仅完成离线验证，尚无正式安装器或 Release。** 这份说明是实现必须遵守的设计原则，不是声称某个已发布软件已经通过全部验收，也不是法律协议。当前验证范围见 [Review Gate](phase1-review-gate.md)。
 
 Neighbor Edition 的目标是帮助您把**自己家的 NEXhome 设备接入自己家的 Home Assistant**。安装不应意味着把家里的控制权交给项目维护者。

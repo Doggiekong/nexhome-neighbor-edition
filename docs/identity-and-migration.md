@@ -1,5 +1,8 @@
 # Identity 与保守迁移
 
+> 当前产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
+
+
 最高原则：**User intent wins. Existing manual customization takes precedence over automatic semantic migration.**
 
 ## Fresh 与 compatibility

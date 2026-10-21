@@ -1,5 +1,8 @@
 # NEXhome Neighbor Edition 总体架构
 
+> 当前产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
+
+
 Status: **Architecture / Prototype Planning**。本文为未来实现的架构提案，不是已发布产品的安装说明。
 
 本文为持续维护的总体架构提案。项目已在独立开发分支实现 Phase 1 Community integration Candidate，并通过离线 Review Gate；具体已实现范围见 [Review Gate](phase1-review-gate.md)。正式 Installer、Community release 尚未发布。文中超出 Phase 1 的组件、接口契约和阶段仍为拟议设计，不代表已开发或验收，也不代表 Candidate 已完成现场验证。

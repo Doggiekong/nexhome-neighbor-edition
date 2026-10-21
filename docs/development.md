@@ -1,5 +1,8 @@
 # Phase 1 Candidate 开发与验证
 
+> 当前产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
+
+
 开发版本 `1.1.17.dev4`；manifest 使用合法 PEP 440 dev version，不伪装官方 `1.1.16`。dev4 收紧 legacy 迁移批准与 marker 恢复，见 [Stage B](phase2-stageb.md)。真实设备现场基线仍是 dev3；其 NSDP 修复与受控现场范围见 [B2 诊断](b2-discovery-diagnostic.md)。
 
 本分支只含 Community integration。没有 Installer、部署脚本、HACS ownership 切换器、LICENSE 决策、Release 或 Beta 邀请。main 仍保持原架构文档基线。

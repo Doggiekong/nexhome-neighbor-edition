@@ -1,5 +1,8 @@
 # 设备兼容性与证据边界
 
+> 当前产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
+
+
 版本：Community Candidate `1.1.17.dev3`，Based on upstream NEXhome v1.1.16。2026-10-21 受控测试环境的本轮证据与此前生产补丁历史证据分开记录。
 
 **Candidate 已在隔离测试 HA 中连接真实 Hub，完成有限代表性现场测试；未安装到生产 HA。** FIELD_VERIFIED 只指当前 Candidate 本轮明确列出的能力，不代表整类型、整户或长期稳定性验收。原生产补丁的历史成功不再混入下表的 Candidate 现场状态。
