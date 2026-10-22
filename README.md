@@ -63,3 +63,6 @@
 ## Credits / Upstream
 
 感谢 [NexHome 官方 Home Assistant integration](https://github.com/nexhome-org/nexhome-homeassistant-component)。基于v1.1.16、commit `bfcc161d7287770651113207cab511f848766fdb` 增强重组；保留原始来源和贡献说明，不声称官方授权。当前无独立LICENSE文件，不推定已具备某种发行许可，公开前仍需核实。见[上游对照](docs/upstream-changes.md)。
+
+
+Stage E 许可核对：**PUBLIC RELEASE BLOCKED BY LICENSE**；[来源、许可证据与分发边界](NOTICE.md)。不因PRIVATE Pilot推定具备公开再分发许可。

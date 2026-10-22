@@ -1,8 +1,10 @@
 """Offline DEV/TEST application context; fixed Candidate, no release or publication."""
 
 import argparse
-import shutil
-from pathlib import Path
+import io
+import subprocess
+import tarfile
+from pathlib import Path, PurePosixPath
 
 from neighbor_installer.build import build
 from neighbor_installer.files import InstallerError, digest, durable, inventory
@@ -14,17 +16,28 @@ def package(repo, revision, output):
     if output.exists() or output == repo or repo in output.parents:
         raise InstallerError('PACKAGE_OUTPUT_MUST_BE_NEW_OUTSIDE_REPOSITORY')
     output.mkdir(parents=True, mode=0o700)
-    for name in ('config.yaml', 'Dockerfile'):
-        shutil.copyfile(repo / 'launcher_addon' / name, output / name)
-    for module in ('neighbor_installer', 'neighbor_launcher'):
-        destination = output / module
-        destination.mkdir()
-        for source in (repo / module).glob('*.py'):
-            shutil.copyfile(source, destination / source.name)
-    web = output / 'neighbor_launcher/web'
-    web.mkdir()
-    for name in ('index.html', 'app.js', 'style.css'):
-        shutil.copyfile(repo / 'neighbor_launcher/web' / name, web / name)
+    # All deployable code comes from the same immutable source revision.
+    # A dirty checkout must never silently change the frozen launcher/installer.
+    resolved = subprocess.check_output(['git', '-C', str(repo), 'rev-parse', '--verify', revision+'^{commit}']).decode().strip()
+    if resolved != revision or len(revision) != 40:
+        raise InstallerError('FULL_COMMIT_PIN_REQUIRED')
+    data = subprocess.check_output(['git', '-C', str(repo), 'archive', revision])
+    with tarfile.open(fileobj=io.BytesIO(data)) as archive:
+        for member in archive.getmembers():
+            path = PurePosixPath(member.name)
+            selected = (
+                path.as_posix() in {'launcher_addon/config.yaml', 'launcher_addon/Dockerfile', 'NOTICE.md'}
+                or (len(path.parts) == 2 and path.parts[0] in {'neighbor_installer', 'neighbor_launcher'} and path.suffix == '.py')
+                or path.as_posix() in {'neighbor_launcher/web/index.html', 'neighbor_launcher/web/app.js', 'neighbor_launcher/web/style.css'}
+            )
+            if not selected:
+                continue
+            if not member.isfile() or path.is_absolute() or '..' in path.parts:
+                raise InstallerError('PACKAGE_SOURCE_NON_REGULAR_FILE')
+            relative = path.name if path.parts[0] == 'launcher_addon' else path.as_posix()
+            target = output / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(archive.extractfile(member).read())
     pin = build(repo, revision, output / 'bundle', ['2026.10.2'])
     (output / 'bundle/artifact.sha256').write_text(pin + '\n', encoding='ascii')
     durable(output / 'trusted-trees.json', {
