@@ -1,0 +1,136 @@
+{
+  "captured_date": "2026-10-22",
+  "images": [
+    {
+      "file": "apps.png",
+      "sha256": "bba5c11735196ad7ac528f6d7ab1392f3957eac732bc82def0b0c9e9ebe003cb",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "areas.png",
+      "sha256": "d53535098f203a107503e1905e1b2cfa61963e4dec36771daa220bd90b4402c9",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "automation.png",
+      "sha256": "eac6be110906d7a55f66bfbcfeb479d364fab964d9c93b831bab8fe93913d7b2",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "dashboard.png",
+      "sha256": "7a72195a9d90063fdb7393c8d194bb47c392db2173f9f6dd3613efe5a5e2aa12",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "deployed.png",
+      "sha256": "15b31894044b82eb5bb29bcdefd1ab818587ac4ca1a4de8bb0f40a36eb8cf8a2",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "devices.png",
+      "sha256": "67ad2b028260577314611ee170b27fe56d9af142dcf6a1b0b4a42616b6fe5120",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "first-control.png",
+      "sha256": "f11ccfb3ae01a8bf8a9d3f1041544e93460603375a67c9860aac05e6fc046e79",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "group.png",
+      "sha256": "574a230d431e0c0513bc73bbad1042e70b0ba23388e02254c1e7aec88dc99853",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "home-zone.png",
+      "sha256": "6ecd50fcd26eff7fc978148e19090e7d2cf2e5420ceef8a687ae03e44975aff0",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "installer-check.png",
+      "sha256": "18229d1a06c0f70cb745f809499d1f4aa34cf1701cb2c3533d0b5603f982f090",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "installer-confirm.png",
+      "sha256": "85b921f228184feeaef6486e2dd740b0162882514ee323f3fae6bafb3c5f797f",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "native-confirm.png",
+      "sha256": "3a8896496d32288d7e89b6db838b0aaed6bdef0a06fa484dc02dc46133b91b26",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop and mask self-test LAN endpoint",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "official-app.png",
+      "sha256": "1d58fc651df9e2558340d45930aa1cd8eaeacdccc166745814ce81d9e86ce8dd",
+      "source": "https://companion.home-assistant.io/download/",
+      "processing": "Crop official banner; omit extra platform badges",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "ready.png",
+      "sha256": "d102885fcb63c43cf462bccbaa77e1d14126dbcd69407892aea797ec97e1cc45",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "scene.png",
+      "sha256": "dd8991395f47fad79c50339952cf4cee4611732db3490121753051dfe8df75ab",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "settings.png",
+      "sha256": "c6df5c03e1bbe352674e4f16e4b5e41602bbc117fbae7200d61140f7bbffd6af",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "sun-trigger.png",
+      "sha256": "4760b65d386f758c43243185d7e795cc9e6c8bbe431c444a4dfe3e740e3a5cd7",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "time-trigger.png",
+      "sha256": "fb2a85371ba9e268ff8d1d32f3aa647a5ad6eaaf374167a88fb8ed8276d23431",
+      "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
+      "processing": "Crop relevant visible UI or original viewport",
+      "scope": "UI illustration, not mobile/voice/real-household field verification"
+    }
+  ],
+  "privacy": "No real household names/coordinates/credentials/SN. Home coordinates are synthetic 0/0. All test UI reverted with VM201 baseline.",
+  "official_store_links": {
+    "ios": "https://apps.apple.com/app/home-assistant/id1099568401",
+    "android": "https://play.google.com/store/apps/details?id=io.homeassistant.companion.android"
+  }
+}
