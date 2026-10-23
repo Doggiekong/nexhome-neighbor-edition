@@ -1,68 +1,98 @@
 # NexHome 滨融府友邻加强版
 
+## 项目简介
+
 一个基于 NexHome 官方 Home Assistant 组件改进、专为滨融府小区住户打造的社区增强版本。
 
-**不是 NexHome 官方新版、官方后续版本或官方授权产品。** 目前产品版本0.1.0，上游基线独立为官方v1.1.16；仍处于私有开发验证阶段，未正式发布、未开放住户试用。
-
-## 开始安装
-
-**[开始安装 → 阅读《NexHome 滨融府友邻加强版：安装与使用指南》](docs/安装与使用指南.md)**
-
-指南覆盖安装准备、连接中控、第一次控制，以及房间、分组、场景和简单自动化。手机端使用官方 Home Assistant App。
+**产品版本 0.1.0，当前状态 RELEASE CANDIDATE；上游基础为官方 v1.1.16。** 已完成内部 Release Candidate 验证，尚未正式公开发布。本项目不是 NexHome 官方新版，也不代表官方团队或官方合作关系。
 
 ## 主要改善
 
 | 原来可能遇到的问题 | 友邻加强版的改善 |
 |---|---|
-| 中控异常时长时间等待，影响HA响应 | 明确超时、有界排队与恢复机制 |
-| 灯、风扇、空调、窗帘被当作普通开关 | 按实际能力显示合适类型，保留旧用户兼容 |
-| 手填中控地址和设备编号 | 已验证的典型单中控局域网里自动查找，保留确认 |
-| 升级影响名称、隐藏状态、房间或自动化 | 用户设置优先，无法安全判断时停止 |
-| 部署文件后不知道下一步 | 统一进入HA原生连接、找到设备和完成首次控制 |
+| 中控异常时一直等待，拖慢 Home Assistant | 为等待设置明确上限，避免请求长期占住系统 |
+| 灯、风扇、空调、窗帘都像普通开关 | 新接入时尽量显示为合适类型；已有用户优先保留原来的控制入口和设置 |
+| 要自己找中控 IP、IOTID 或 SN | 已验证的典型单中控家庭网络可自动查找，最后由您确认 |
+| 升级后担心名字、隐藏、房间或自动化被打乱 | 优先保留用户设置；不能确认安全时停止，不删除重建 |
+| 文件装好了，却不知道怎样找到设备 | 继续进入 HA 原生连接，直到设备可见、首次控制读回成功，并确认知道控制入口 |
 
-有限现场和隔离测试不代表所有型号/网络/长期场景都已覆盖。
+有限现场验证不代表所有型号、网络和长期使用场景都已覆盖。
 
 ## 适合谁
 
-滨融府住户、使用开发商原配NexHome、已有正常可用HA和管理员权限，希望更稳定接入，或从官方组件迁移。HA与中控需在可通信的家庭网络里，通常不用预先知道IP/IOTID/SN。
+- 滨融府住户，使用开发商原配 NexHome。
+- 已经有正常可用的 Home Assistant，并有管理员权限。
+- 希望将 NexHome 更稳定地接入 Home Assistant，包括已有官方组件的用户。
 
-项目从“已经有可用的Home Assistant”开始，不负责安装HA/NAS/PVE/Docker主机或配置家庭网络。HA OS使用安装助手；已验证的Linux Docker环境使用一次性Terminal。具体操作和当前PRIVATE分发限制见指南。
+本项目的边界从 **已经有 Home Assistant** 开始，不负责替您部署 HA、NAS、PVE、Docker Host、路由器或家庭公网。
+
+## 安装前置条件
+
+- 已经能正常打开 Home Assistant，并以管理员身份登录。
+- Home Assistant 与 NexHome 中控可以在家庭网络中通信。
+- 建议先保留一次 HA 备份。
+- 手机端使用官方 Home Assistant App。
+
+典型单中控环境通常不需要预先知道 Hub IP、IOTID 或 SN。
+
+## 开始安装
+
+**[开始安装 →《NexHome 滨融府友邻加强版：安装与使用指南》](docs/安装与使用指南.md#choose-route)**
+
+先在 HA 的“系统信息”查看安装类型，再二选一：
+
+| 您的 HA 类型 | 选择的入口 |
+|---|---|
+| Home Assistant OS | [A：App 安装](docs/安装与使用指南.md#route-a) |
+| Container / Docker / NAS / Linux 等其他环境 | [B：Terminal 安装](docs/安装与使用指南.md#route-b)，先核对本机运行环境 |
+
+**只选一种。App 和 Terminal 是两个安装入口，不是前后两个步骤。** 两者都进入同一组件、HA 原生连接、设备可见和首次控制确认流程。当前没有公开下载入口；内部固定包与本机执行环境须先由维护者准备，不要寻找第三方替代脚本。
 
 ## 安全和隐私
 
-设备发现和控制主要在自己的HA与家庭网络中完成，不默认上传设备状态或家庭使用历史。不要求把HA密码、Wi-Fi密码或中控编号发给维护者。先检查和备份，失败尽量恢复；不能安全逆转时明确停止。保留已有名称、隐藏、禁用、房间和引用，不自动改Dashboard/Area/Automation/家庭成员/路由器。升级前仍请自行保留HA备份。
+设备发现和控制主要在自己的 HA 与家庭网络中完成，不默认上传设备状态或家庭使用历史。无需把 HA 密码、Wi-Fi 密码或中控编号发给维护者。
 
-## 常见问题
+先检查和备份；已有安装保留名称、隐藏、禁用、房间和引用，不自动整理 Dashboard、自动化或家庭成员。遇到来源冲突或无法安全恢复的情况会停止，不能把“换回代码”等同于恢复全部 HA 设置。项目不自动修改路由器或开放公网。
 
-**官方软件吗？** 不是，是基于官方组件的住户社区增强版本。
+## 常见问题 Q&A
 
-**要手填IP/IOTID吗？** 典型单中控网络通常不用。多中控需选择，网络隔离需排查。
+**这是官方软件吗？** 不是，是以官方组件为基础的住户社区增强版本。
 
-**会影响已有自动化吗？** 优先保留身份和用户设置，无法判断安全时停止；不能保证所有第三方升级都零风险。
+**两条安装路线都要做吗？** 不用。HAOS 选 App，其他适合的已准备环境选 Terminal；连接和首次使用步骤相同。
 
-**没有HA可以用吗？** 需要先有正常可用的HA。
+**要手填 IP、IOTID 或 SN 吗？** 已验证的典型单中控网络通常不用。多中控需选择，网络隔离需单独检查。
 
-**HACS必须吗？** 不是；但同一安装只能由一个工具负责更新。
+**已有自动化会被重建吗？** 正常升级优先沿用原身份和设置，不删除重建；不能保证任何第三方环境都零风险，请先备份。
 
-**现在能给邻居安装吗？** 当前无公开发行入口，不是正式发布或Pilot。
+**没有 Home Assistant 可以用吗？** 需要先有正常可用的 HA；本项目不负责安装 HA 主机。
 
----
+**需要 HACS 吗？** 不是必需。同一安装只由一个工具负责更新；已有 HACS 来源要按受支持流程交接。
 
-# 技术说明
+**为什么有的窗帘显示“未知”？** 部分原设备只支持开、关、停，没有位置反馈。仍可明确操作，不应伪造百分比。
 
-以下面向高级用户和维护者，普通用户可跳过。
+**现在已经公开发布了吗？** 没有。当前是 PRIVATE 仓库中的 0.1.0 Release Candidate；没有公开下载、GitHub Release、tag 或 HACS 发布。
 
-- [独立版本体系](docs/product-versioning.md)：product0.1.0与upstream1.1.16分开；dev1–dev4仅历史编号。
+## 致谢
+
+### NexHome 官方
+
+感谢 [NexHome 官方 Home Assistant integration](https://github.com/nexhome-org/nexhome-homeassistant-component) 提供原始开发基础。本项目基于 **v1.1.16** 改进，保留上游来源与贡献说明。
+
+### 邻居 Neil
+
+感谢邻居 Neil。[Neil-UWA/nexhome-homeassistant-component](https://github.com/Neil-UWA/nexhome-homeassistant-component) 的项目和实现思路，为部分问题分析与修改方向提供了参考和启发。本致谢不表示 Neil 为本项目背书或是共同作者，也不表示官方合作。
+
+## 技术说明
+
+普通住户可跳过本节。
+
+- [当前 RC 状态与 main 基线](docs/rc-status.md)
+- [安装与使用指南](docs/安装与使用指南.md) · [来源与致谢说明](NOTICE.md)
+- [独立版本体系](docs/product-versioning.md)：产品 0.1.0 与上游 1.1.16 分开。
 - [架构](docs/architecture.md) · [隐私](docs/privacy-and-safety.md) · [兼容矩阵](docs/device-compatibility.md)
-- [身份与迁移](docs/identity-and-migration.md)：USER INTENT WINS，保留entry/entity/device身份、rename/hidden/disabled/Area/wrapper和引用。
-- [Stage D.6 完成边界与验证](docs/phase2-staged6.md)：COMMITTED只等于DEPLOYED；CONFIGURED/CONTROL_VERIFIED/用户确认的READY分开。
-- [Stage D.5](docs/phase2-staged5-validation.md) · [Stage D](docs/phase2-staged-validation.md) · [Stage C](docs/phase2-stagec.md) · [Stage B](docs/phase2-stageb.md) · [Installer核心](docs/phase2-installer.md)
+- [身份与迁移](docs/identity-and-migration.md)：USER INTENT WINS。
+- [Stage E 历史验证](docs/phase2-stagee-validation.md) · [Stage D.6](docs/phase2-staged6.md) · [Stage C](docs/phase2-stagec.md) · [Installer 核心](docs/phase2-installer.md)
 
-异步HTTP使用connect/read/total timeout；共享scheduler/coordinator，串行分片轮询与控制公平排队；pending/readback/stale-query保护。freshness失败不刷新，climate/cover分离必需与可选字段，无位置不伪造状态。UDP1912仅提示真实读回；NSDP确认后使用本地认证。App/Terminal同artifact/schema2/owner，渠道冲突停止，rollback与RECOVERY_REQUIRED明确区分。历史验证报告不改写，当前测试数见本轮报告。
+技术实现包括明确 HTTP 超时、共享串行分片轮询、控制公平排队、待确认状态与真实读回、旧查询保护，以及必需/可选属性区分。App/Terminal 使用同一固定包，来源不明和渠道冲突不强行覆盖，回滚与 RECOVERY_REQUIRED 分开说明。
 
-## Credits / Upstream
-
-感谢 [NexHome 官方 Home Assistant integration](https://github.com/nexhome-org/nexhome-homeassistant-component)。基于v1.1.16、commit `bfcc161d7287770651113207cab511f848766fdb` 增强重组；保留原始来源和贡献说明，不声称官方授权。当前无独立LICENSE文件，不推定已具备某种发行许可，公开前仍需核实。见[上游对照](docs/upstream-changes.md)。
-
-
-Stage E 许可核对：**PUBLIC RELEASE BLOCKED BY LICENSE**；[来源、许可证据与分发边界](NOTICE.md)。不因PRIVATE Pilot推定具备公开再分发许可。
+License / publication authorization: **USER MANAGED / OUTSIDE TECHNICAL GATE**。由用户负责，不作为技术 Gate、RC 或 main 整合阻断；不表示任何官方授权。历史报告保持原文，当前状态以 [RC 状态](docs/rc-status.md) 为准。

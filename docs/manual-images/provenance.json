@@ -126,6 +126,15 @@
       "source": "Actual VM201 isolated HA2026.10.2 browser screenshot; synthetic devices only",
       "processing": "Crop relevant visible UI or original viewport",
       "scope": "UI illustration, not mobile/voice/real-household field verification"
+    },
+    {
+      "file": "system-information-official.png",
+      "sha256": "5a5e4cbca5d905e1a900832fb199e4941ae4e535f6f9e99bbd09c2ec3363c7e0",
+      "source": "https://www.home-assistant.io/images/more-info/system_information.png",
+      "source_page": "https://www.home-assistant.io/more-info/system-information/",
+      "processing": "Original official example; no UI recreation or new VM capture",
+      "scope": "Shows Installation type field; screenshot itself shows a different version, explicitly captioned",
+      "retrieved_date": "2026-10-24"
     }
   ],
   "privacy": "No real household names/coordinates/credentials/SN. Home coordinates are synthetic 0/0. All test UI reverted with VM201 baseline.",
