@@ -232,3 +232,11 @@ def test_arrow_menu_actual_pty():
         os.kill(pid, signal.SIGKILL)
         os.waitpid(pid, 0)
         os.close(fd)
+
+
+def test_specific_lan_binding_is_not_assumed_to_listen_on_loopback():
+    row = target()
+    row['NetworkSettings']['Ports']['80/tcp'][0]['HostIp'] = '192.168.0.20'
+    selected = entry.candidates([row], '192.168.0.20')[0]
+    assert selected['connect_url'] == 'http://192.168.0.20:18123'
+    assert selected['unsupported'] is None

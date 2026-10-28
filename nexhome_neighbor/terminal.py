@@ -123,11 +123,14 @@ def candidates(rows, lan_ip):
         ports = x.get('NetworkSettings', {}).get('Ports', {}) or {}
         bindings = [(p, b) for p, values in ports.items() for b in (values or []) if p in {'80/tcp', '8123/tcp'}]
         port = None
+        connect_host = '127.0.0.1'
         unique = {(p, b.get('HostPort')) for p, b in bindings}
         if len(unique) == 1:
             _, binding = next(((p, b) for p, b in bindings if b.get('HostIp') in {'0.0.0.0', '127.0.0.1', lan_ip}), bindings[0])
             port = binding.get('HostPort')
             ip = binding.get('HostIp')
+            if ip == lan_ip:
+                connect_host = lan_ip
             if ip not in {'0.0.0.0', '127.0.0.1', '::', lan_ip}:
                 reason = '此容器的网页绑定暂不能可靠判断，请让本机管理员确认。'
         elif x.get('HostConfig', {}).get('NetworkMode') == 'host':
@@ -137,7 +140,7 @@ def candidates(rows, lan_ip):
             reason = '没有找到唯一的HA网页端口映射，请让本机管理员确认。'
         found.append({'name': x['Name'].lstrip('/'), 'id': x['Id'], 'image': x['Image'],
                       'config': config, 'running': bool(x.get('State', {}).get('Running')),
-                      'connect_url': 'http://127.0.0.1:' + str(port) if port else None,
+                      'connect_url': 'http://' + connect_host + ':' + str(port) if port else None,
                       'browser_url': 'http://' + lan_ip + ':' + str(port) if port else None,
                       'unsupported': reason, 'network_mode': x.get('HostConfig', {}).get('NetworkMode')})
     return found
