@@ -1,0 +1,23 @@
+name: "NexHome 滨融府友邻加强版"
+version: "0.1.0"
+slug: "nexhome_neighbor"
+description: "在自己的 Home Assistant 中安装、更新和检查 NexHome"
+arch:
+  - amd64
+startup: application
+boot: manual
+init: false
+ingress: true
+ingress_port: 8099
+panel_admin: true
+panel_title: "NexHome 安装助手"
+panel_icon: "mdi:home-outline"
+homeassistant_api: true
+hassio_api: true
+hassio_role: homeassistant
+map:
+  - type: homeassistant_config
+    read_only: false
+    path: /homeassistant
+options: {}
+schema: {}

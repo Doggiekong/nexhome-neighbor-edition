@@ -27,6 +27,8 @@ def package(repo, revision, output):
             path = PurePosixPath(member.name)
             selected = (
                 path.as_posix() in {'launcher_addon/config.yaml', 'launcher_addon/Dockerfile', 'NOTICE.md'}
+                or path.as_posix() in {'distribution/.templates/launcher_addon/config.yaml',
+                                      'distribution/.templates/launcher_addon/Dockerfile'}
                 or (len(path.parts) == 2 and path.parts[0] in {'neighbor_installer', 'neighbor_launcher'} and path.suffix == '.py')
                 or path.as_posix() in {'neighbor_launcher/web/index.html', 'neighbor_launcher/web/app.js', 'neighbor_launcher/web/style.css'}
             )
@@ -34,7 +36,8 @@ def package(repo, revision, output):
                 continue
             if not member.isfile() or path.is_absolute() or '..' in path.parts:
                 raise InstallerError('PACKAGE_SOURCE_NON_REGULAR_FILE')
-            relative = path.name if path.parts[0] == 'launcher_addon' else path.as_posix()
+            template = path.parts[0] == 'launcher_addon' or path.parts[:3] == ('distribution', '.templates', 'launcher_addon')
+            relative = path.name if template else path.as_posix()
             target = output / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(archive.extractfile(member).read())
