@@ -3,8 +3,8 @@
   "artifact_archive_sha256": "9c689161a068d840d1be66f88f1673fca2b5f4866a04b93237fe6b8b8679b093",
   "artifact_manifest_sha256": "f6102c029ee3c27f65beafc68a5cbf22639df2a3a2dc713e0131f84144e390e1",
   "runtime_source_commit": "c9246a1bce8fa087f2b590667d683fa1f47d4964",
-  "frontend_sha256": "d3800351106a24868dcb12b080cccb66a847e280544058c29fde94e4eb76d2b8",
-  "bootstrap_sha256": "6577c4d479e9f8225a6618f5f14342779b8b06d2a19253a2617936b925539a31",
+  "frontend_sha256": "35925b5f6bf658a66c6b9fdcaf12b2bd9c60948b705e92504f971722a701f7fa",
+  "bootstrap_sha256": "77cefb5d28c74d9f128cb1eea3fd7ce0a3e95a8c033366a70a2b7b342ace989d",
   "future_release_base": "https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.0",
   "public_release_created": false
 }

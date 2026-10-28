@@ -343,6 +343,7 @@ def host(args):
             preview = run_worker(chosen, directory, 'preview', tokens['access_token'])
             print('✓ Home Assistant ' + str(preview['details']['technical'].get('ha_version') or '版本已检查'), flush=True)
             print(preview['title'], flush=True)
+            result = preview
             if preview['screen'] not in {'confirm', 'configured', 'ready', 'installed', 'latest'}:
                 raise FriendlyError('检查发现当前来源或恢复状态需要处理，本次不会继续。', 'CORE_PREVIEW_REFUSED')
             if preview['screen'] == 'confirm':
@@ -359,7 +360,10 @@ def host(args):
                     raise FriendlyError('安装尚未完成，请保留当前状态和备份，不要删除重建。', 'CORE_DEPLOYMENT_NOT_COMPLETED')
             print('✓ 组件部署已确认；已有配置会沿用。', flush=True)
             print('请在浏览器打开：' + chosen['browser_url'] + '/config/integrations/integration/nexhome', flush=True)
-            print('新安装连接入口：' + chosen['browser_url'] + '/_my_redirect/config_flow_start?domain=nexhome', flush=True)
+            native = result.get('native_url') or '/config/integrations/integration/nexhome'
+            if not native.startswith('/config/integrations/'):
+                raise FriendlyError('安装核心没有返回可确认的HA连接入口，请保留现状。', 'NATIVE_ENTRY_UNCONFIRMED')
+            print('HA原生连接入口：' + chosen['browser_url'] + native, flush=True)
             while True:
                 action = choose('回到HA完成原生连接，看到设备，操作一盏灯并核对真实状态。', ['已找到设备并完成首次操作，检查READY', '查看技术详情', '稍后继续，安全退出'])
                 if action == 2:
