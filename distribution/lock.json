@@ -5,6 +5,6 @@
   "runtime_source_commit": "c9246a1bce8fa087f2b590667d683fa1f47d4964",
   "frontend_sha256": "1445ccae9faf1ed01ded39822e94c096dff6eae7a087f152c581bde23a2d878e",
   "bootstrap_sha256": "9ee729ad1672753ed9a8f2626b3461eecba89d80116f8af43a0c1c80f4402e16",
-  "future_release_base": "https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.0",
-  "public_release_created": false
+  "release_base": "https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.0",
+  "public_release_created": true
 }

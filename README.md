@@ -4,7 +4,7 @@
 
 一个基于 NexHome 官方 Home Assistant 组件改进、专为滨融府大平层住户打造的社区增强版本。
 
-**产品版本 0.1.0，当前状态 RELEASE CANDIDATE；上游基础为官方 v1.1.16。** 已完成内部 Release Candidate 验证，尚未正式公开发布。本项目不是 NexHome 官方新版，也不代表官方团队或官方合作关系。
+**正式发布版本 [v0.1.0](https://github.com/Doggiekong/nexhome-neighbor-edition/releases/tag/v0.1.0)；上游基础为官方 v1.1.16。** 本项目不是 NexHome 官方新版，也不代表官方团队或官方合作关系。
 
 ## 主要改善
 
@@ -50,7 +50,7 @@
 
 **[Terminal 安装](docs/安装与使用指南.md#route-b)** → 一条完整命令、自动检测和方向键菜单。
 
-当前仍是 **PRIVATE RC**，没有公开 Release 下载。上面的官方添加按钮不绕过私库权限；本轮已用受控等价分发源验证两条路线。不要把尚未开放的公开入口当作已经发布，也不要自行填写下载地址。[RC 分发验证与当前入口边界](docs/rc-distribution-bootstrap.md)
+安装包从本项目的固定 [v0.1.0 Release](https://github.com/Doggiekong/nexhome-neighbor-edition/releases/tag/v0.1.0) 取得并校验。两条路线都进入同一个安装核心；已有安装优先保留，不能安全确认来源时停止。当前主要实测平台为 amd64 HAOS 和 Linux Docker，其他平台不冒称已完整验证。
 
 ## 安全和隐私
 
@@ -74,7 +74,7 @@
 
 **为什么有的窗帘显示“未知”？** 部分原设备只支持开、关、停，没有位置反馈。仍可明确操作，不应伪造百分比。
 
-**现在已经公开发布了吗？** 没有。当前是 PRIVATE 仓库中的 0.1.0 Release Candidate；没有公开下载、GitHub Release、tag 或 HACS 发布。
+**现在已经公开发布了吗？** 是，正式版本为 [v0.1.0](https://github.com/Doggiekong/nexhome-neighbor-edition/releases/tag/v0.1.0)，仓库和 Release assets 可公开访问。HACS 发布尚未进行；不要把公开 GitHub 仓库等同于已经上架 HACS。
 
 ## 致谢
 
@@ -84,17 +84,15 @@
 
 ### 邻居 Neil
 
-**特别感谢邻居 Neil。**
+**特别感谢邻居 Neil，他的 NexHome Home Assistant 项目为本项目提供了不少参考和启发。**
 
-Neil 此前对 NexHome 接入 Home Assistant 所做的探索和项目，为本项目提供了非常有价值的参考。我们在后续分析 NexHome 的设备模型、运行问题和改进方向时，也从他的工作中获得了不少启发，少走了很多弯路。
-
-技术参考项目：[Neil-UWA/nexhome-homeassistant-component](https://github.com/Neil-UWA/nexhome-homeassistant-component)。这里记录参考与启发，不表示共同作者、项目背书、正式合作或官方关系。
+技术参考项目：[Neil-UWA/nexhome-homeassistant-component](https://github.com/Neil-UWA/nexhome-homeassistant-component)
 
 ## 技术说明
 
 普通住户可跳过本节。
 
-- [当前 RC 状态与 main 基线](docs/rc-status.md)
+- [当前发布状态与 main 基线](docs/rc-status.md)
 - [安装与使用指南](docs/安装与使用指南.md) · [来源与致谢说明](NOTICE.md)
 - [独立版本体系](docs/product-versioning.md)：产品 0.1.0 与上游 1.1.16 分开。
 - [架构](docs/architecture.md) · [隐私](docs/privacy-and-safety.md) · [兼容矩阵](docs/device-compatibility.md)
@@ -103,4 +101,4 @@ Neil 此前对 NexHome 接入 Home Assistant 所做的探索和项目，为本�
 
 技术实现包括明确 HTTP 超时、共享串行分片轮询、控制公平排队、待确认状态与真实读回、旧查询保护，以及必需/可选属性区分。App/Terminal 使用同一固定包，来源不明和渠道冲突不强行覆盖，回滚与 RECOVERY_REQUIRED 分开说明。
 
-License / publication authorization: **USER MANAGED / OUTSIDE TECHNICAL GATE**。由用户负责，不作为技术 Gate、RC 或 main 整合阻断；不表示任何官方授权。历史报告保持原文，当前状态以 [RC 状态](docs/rc-status.md) 为准。
+License / publication authorization: **USER MANAGED / OUTSIDE TECHNICAL GATE**。由用户负责，不作为技术 Gate 或发布阻断；不表示任何官方授权。历史报告保持原文，当前状态以 [发布状态](docs/rc-status.md) 为准。

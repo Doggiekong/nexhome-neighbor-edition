@@ -1,5 +1,7 @@
 # RC Distribution Bootstrap 验证
 
+> 历史设计/验证记录：保留当时事实。当前已公开的 v0.1.0 与安装入口以[发布状态](rc-status.md)和[使用指南](安装与使用指南.md)为准；下文旧 PRIVATE/未发布描述不代表当前状态。
+
 2026-10-29：先实现、再实机验证、最后修订指南。Product 0.1.0 RELEASE CANDIDATE，仓库 PRIVATE；没有 tag、Release、HACS 发布或住户部署。
 
 ## 当前来源边界

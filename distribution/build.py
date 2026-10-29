@@ -26,7 +26,7 @@ def assemble(root):
             'runtime_source_commit': 'c9246a1bce8fa087f2b590667d683fa1f47d4964',
             'frontend_sha256': runner,
             'bootstrap_sha256': hashlib.sha256(shell.read_bytes()).hexdigest(),
-            'future_release_base': DEFAULT_SOURCE, 'public_release_created': False}
+            'release_base': DEFAULT_SOURCE, 'public_release_created': True}
     (root / 'distribution/lock.json').write_text(json.dumps(lock, indent=2) + '\n', encoding='utf-8', newline='\n')
     return lock
 

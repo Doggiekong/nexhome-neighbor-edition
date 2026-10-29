@@ -1,5 +1,6 @@
 """Verify/extract the same immutable packet before starting its existing HAOS UI."""
 import hashlib
+import importlib
 import os
 import runpy
 import sys
@@ -29,4 +30,20 @@ os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(target))
 os.chdir(target)
+# Public presentation overlay: do not rewrite the immutable SDK/runtime packet.
+server = importlib.import_module('neighbor_launcher.server')
+
+public_web = Path('/opt/distribution/public-web')
+public_web.mkdir(exist_ok=True)
+if any(p.is_symlink() or p.name not in {'index.html', 'app.js', 'style.css'} for p in public_web.iterdir()):
+    raise SystemExit('公开界面目录与预期不一致，未启动。')
+for name in ('index.html', 'app.js', 'style.css'):
+    content = (server.WEB / name).read_bytes()
+    if name == 'index.html':
+        old = '开发测试版本 · 尚未向真实住户发布'.encode()
+        if content.count(old) != 1:
+            raise SystemExit('固定界面文案与预期不一致，未启动。')
+        content = content.replace(old, '正式发布版本 v0.1.0'.encode())
+    (public_web / name).write_bytes(content)
+server.WEB = public_web
 runpy.run_module('neighbor_launcher', run_name='__main__')

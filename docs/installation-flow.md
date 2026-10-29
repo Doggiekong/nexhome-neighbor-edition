@@ -3,7 +3,7 @@
 > 当前产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
 
 
-**以下保留早期规划，不是当前可执行安装教程。** 现已实现并验证 RC Bootstrap/菜单和 App repository；当前步骤见[安装与使用指南](安装与使用指南.md)，实际私有等价源与公开分发边界见[RC 分发验证](rc-distribution-bootstrap.md)。公开 Release 仍未发布。
+**以下保留早期规划，不是当前可执行安装教程。** 现已实现并验证 RC Bootstrap/菜单和 App repository；当前步骤见[安装与使用指南](安装与使用指南.md)，实际私有等价源与公开分发边界见[RC 分发验证](rc-distribution-bootstrap.md)。该段是历史规划；当前正式 v0.1.0 已公开，使用上面的当前指南。
 
 目标是少填参数、清楚知道每一步、失败能恢复。您不需要把 HA 密码、中控 SN 或其他敏感凭据交给项目维护者。
 

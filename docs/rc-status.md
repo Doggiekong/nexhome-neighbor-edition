@@ -1,18 +1,18 @@
-# NexHome 滨融府友邻加强版 0.1.0 — RELEASE CANDIDATE
+# NexHome 滨融府友邻加强版 v0.1.0 — 正式发布版本
 
 | 项目 | 当前定义 |
 |---|---|
 | Product | NexHome 滨融府友邻加强版 / NEXhome Neighbor Edition |
 | Version | 0.1.0 |
-| Status | **RELEASE CANDIDATE** |
-| Git baseline | **main**（RC 分发分支通过验收后仅允许 fast-forward） |
-| Repository | PRIVATE |
+| Status | **正式发布版本 v0.1.0** |
+| Git baseline | **main**（tag v0.1.0 指向正式发布提交） |
+| Repository | PUBLIC |
 | Phase 2 Stage E | COMPLETE_STOPPED |
 | Technical assessment | RELEASE_CANDIDATE_READY |
 | License / publication authorization | **USER MANAGED / OUTSIDE TECHNICAL GATE** |
-| Public | NO |
-| GitHub Release | NO |
-| Tag | NO |
+| Public | YES |
+| GitHub Release | [v0.1.0](https://github.com/Doggiekong/nexhome-neighbor-edition/releases/tag/v0.1.0) |
+| Tag | v0.1.0 |
 | HACS publication | NO |
 
 Stage E 的 runtime 与 Installer/Controller 行为核心继续冻结于 `c9246a1bce8fa087f2b590667d683fa1f47d4964`。RC Distribution Bootstrap 增加普通用户下载/检测/菜单前端及官方 App repository；模板构建路径作兼容调整，运行与迁移行为核心不变。精确本轮 HEAD 和环境恢复证据见 Work 最终审计。
@@ -24,11 +24,17 @@ License / publication authorization 仍为 USER MANAGED / OUTSIDE TECHNICAL GATE
 ## 仍需保留的能力边界
 
 - 内部RC验证不是所有型号、NAS、语音平台、手机与远程访问或长期可靠性的保证。
-- HAOS App与Terminal二选一；当前没有公开分发入口。
-- Terminal 已有一条完整下载命令、环境检测与方向键菜单；本轮实机限 Linux Docker bind mount。公开 Release 尚未创建，私人等价源验收不代表任意住户现在可匿名下载。
+- HAOS App 与 Terminal 二选一；正式仓库和固定 Release assets 公开提供。
+- Terminal 已有一条完整下载命令、环境检测与方向键菜单；本轮实机限 Linux Docker bind mount。正式命令使用固定 v0.1.0 公网 Release 路径，源码与包均须校验。
 - Edge 内嵌页重开曾停在 Loading；独立浏览器内嵌 READY 已通过。没有认定具体浏览器故障原因。
 - 安装以设备可见、首次控制真实读回、用户确认READY为完成边界；已有entry沿用。
 - 无位置窗帘保持unknown；滨融府大平层原配家庭语音中控和列出的语音平台仍NOT YET VERIFIED。
 - 代码回滚不等于完整逆转registry/schema；历史恢复边界保持。
 
-完成main整合后停止；这不是正式发布、公开仓库、tag、Release、HACS/Beta或邻居Pilot的授权。
+v0.1.0 Public Cutover 与公网 smoke test 完成后停止。不自动开展 HACS/Beta、邻居 Pilot 或下一版本。
+
+## 正式发布入口
+
+[GitHub 仓库](https://github.com/Doggiekong/nexhome-neighbor-edition) · [v0.1.0 Release](https://github.com/Doggiekong/nexhome-neighbor-edition/releases/tag/v0.1.0) · [安装与使用指南](安装与使用指南.md)。
+
+历史 Stage E / RC Bootstrap 的提交、测试数字和 PRIVATE 状态保留当时事实，不当作今天的产品状态。对外 App 页脚由分发包装提供正式版本文案；冻结 runtime/SDK 包不重打。
