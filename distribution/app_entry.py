@@ -25,6 +25,8 @@ if target.exists():
 else:
     extract_payload(archive, target)
 os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
+# Setting the environment after interpreter startup alone does not disable pyc.
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(target))
 os.chdir(target)
 runpy.run_module('neighbor_launcher', run_name='__main__')

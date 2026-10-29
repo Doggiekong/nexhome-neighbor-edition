@@ -240,3 +240,25 @@ def test_specific_lan_binding_is_not_assumed_to_listen_on_loopback():
     selected = entry.candidates([row], '192.168.0.20')[0]
     assert selected['connect_url'] == 'http://192.168.0.20:18123'
     assert selected['unsupported'] is None
+
+
+def test_app_repeated_boot_does_not_add_bytecode_to_frozen_tree(tmp_path):
+    import subprocess
+    source = (ROOT / 'distribution/app_entry.py').read_text()
+    source = source.replace("Path('/opt/distribution/payload.tar.gz')", "Path(" + repr(str(ROOT / 'nexhome_neighbor/payload.tar.gz')) + ")")
+    source = source.replace("Path('/opt/nexhome')", "Path(" + repr(str(tmp_path / 'extracted')) + ")")
+    # Run the actual entry/extraction twice in a real fresh interpreter. Import
+    # frozen SDK modules instead of starting a privileged HTTP service.
+    script = """import sys, runpy, importlib
+sys.path.insert(0, DIST)
+runpy.run_module = lambda *a, **k: importlib.import_module('neighbor_installer.engine')
+source = SOURCE
+for _ in range(2):
+    sys.dont_write_bytecode = False
+    exec(compile(source, 'app_entry.py', 'exec'), {})
+assert sys.dont_write_bytecode
+from pathlib import Path
+assert not list(Path(TARGET).rglob('*.pyc'))
+""".replace('DIST', repr(str(ROOT / 'distribution'))).replace('SOURCE', repr(source)).replace('TARGET', repr(str(tmp_path / 'extracted')))
+    result = subprocess.run([sys.executable, '-c', script], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
