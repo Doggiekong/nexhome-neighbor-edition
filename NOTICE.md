@@ -8,7 +8,11 @@ NexHome 滨融府友邻加强版（NEXhome Neighbor Edition）是基于官方 Ho
 
 ## 邻居 Neil
 
-感谢邻居 Neil。[Neil-UWA/nexhome-homeassistant-component](https://github.com/Neil-UWA/nexhome-homeassistant-component) 的项目和实现思路为部分问题分析与修改方向提供了参考和启发。这不表示 Neil 为本项目背书、与官方合作或是本项目共同作者。
+**特别感谢邻居 Neil。**
+
+Neil 此前对 NexHome 接入 Home Assistant 所做的探索和项目，为本项目提供了非常有价值的参考。我们在后续分析 NexHome 的设备模型、运行问题和改进方向时，也从他的工作中获得了不少启发，少走了很多弯路。
+
+技术参考项目：[Neil-UWA/nexhome-homeassistant-component](https://github.com/Neil-UWA/nexhome-homeassistant-component)。这里记录参考与启发，不表示共同作者、项目背书、正式合作或官方关系。
 
 ## 当前状态
 

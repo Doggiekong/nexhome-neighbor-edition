@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-一个基于 NexHome 官方 Home Assistant 组件改进、专为滨融府小区住户打造的社区增强版本。
+一个基于 NexHome 官方 Home Assistant 组件改进、专为滨融府大平层住户打造的社区增强版本。
 
 **产品版本 0.1.0，当前状态 RELEASE CANDIDATE；上游基础为官方 v1.1.16。** 已完成内部 Release Candidate 验证，尚未正式公开发布。本项目不是 NexHome 官方新版，也不代表官方团队或官方合作关系。
 
@@ -20,9 +20,12 @@
 
 ## 适合谁
 
-- 滨融府住户，使用开发商原配 NexHome。
+- 滨融府大平层住户，使用开发商交付的 NexHome 智能家居系统。
+- 设备组合与当前实测大平层环境相近。
 - 已经有正常可用的 Home Assistant，并有管理员权限。
 - 希望将 NexHome 更稳定地接入 Home Assistant，包括已有官方组件的用户。
+
+当前设备识别、兼容性和现场验证主要基于滨融府大平层实际交付的 NexHome 中控与设备组合。其他户型或不同设备组合可能也能使用，但目前不作为完整已验证范围。
 
 本项目的边界从 **已经有 Home Assistant** 开始，不负责替您部署 HA、NAS、PVE、Docker Host、路由器或家庭公网。
 
@@ -37,16 +40,17 @@
 
 ## 开始安装
 
-**[开始安装 →《NexHome 滨融府友邻加强版：安装与使用指南》](docs/安装与使用指南.md#choose-route)**
+**两种方式只需要选择一种。** 不必预先复制源码或准备维护者环境变量。
 
-先在 HA 的“系统信息”查看安装类型，再二选一：
+### Home Assistant OS
 
-| 您的 HA 类型 | 选择的入口 |
-|---|---|
-| Home Assistant OS | [A：App 安装](docs/安装与使用指南.md#route-a) |
-| Container / Docker / NAS / Linux 等其他环境 | [B：Terminal 安装](docs/安装与使用指南.md#route-b)，先核对本机运行环境 |
+**[添加到 Home Assistant](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FDoggiekong%2Fnexhome-neighbor-edition)** → [HAOS 详细教程](docs/安装与使用指南.md#route-a)
 
-**只选一种。App 和 Terminal 是两个安装入口，不是前后两个步骤。** 两者都进入同一组件、HA 原生连接、设备可见和首次控制确认流程。当前没有公开下载入口；内部固定包与本机执行环境须先由维护者准备，不要寻找第三方替代脚本。
+### NAS / Docker / Container / Linux
+
+**[Terminal 安装](docs/安装与使用指南.md#route-b)** → 一条完整命令、自动检测和方向键菜单。
+
+当前仍是 **PRIVATE RC**，没有公开 Release 下载。上面的官方添加按钮不绕过私库权限；本轮已用受控等价分发源验证两条路线。不要把尚未开放的公开入口当作已经发布，也不要自行填写下载地址。[RC 分发验证与当前入口边界](docs/rc-distribution-bootstrap.md)
 
 ## 安全和隐私
 
@@ -58,7 +62,7 @@
 
 **这是官方软件吗？** 不是，是以官方组件为基础的住户社区增强版本。
 
-**两条安装路线都要做吗？** 不用。HAOS 选 App，其他适合的已准备环境选 Terminal；连接和首次使用步骤相同。
+**两条安装路线都要做吗？** 不用。HAOS 选 App，已验证的 Linux Docker 环境选 Terminal；连接和首次使用步骤相同。
 
 **要手填 IP、IOTID 或 SN 吗？** 已验证的典型单中控网络通常不用。多中控需选择，网络隔离需单独检查。
 
@@ -80,7 +84,11 @@
 
 ### 邻居 Neil
 
-感谢邻居 Neil。[Neil-UWA/nexhome-homeassistant-component](https://github.com/Neil-UWA/nexhome-homeassistant-component) 的项目和实现思路，为部分问题分析与修改方向提供了参考和启发。本致谢不表示 Neil 为本项目背书或是共同作者，也不表示官方合作。
+**特别感谢邻居 Neil。**
+
+Neil 此前对 NexHome 接入 Home Assistant 所做的探索和项目，为本项目提供了非常有价值的参考。我们在后续分析 NexHome 的设备模型、运行问题和改进方向时，也从他的工作中获得了不少启发，少走了很多弯路。
+
+技术参考项目：[Neil-UWA/nexhome-homeassistant-component](https://github.com/Neil-UWA/nexhome-homeassistant-component)。这里记录参考与启发，不表示共同作者、项目背书、正式合作或官方关系。
 
 ## 技术说明
 

@@ -1,22 +1,22 @@
-# Distribution design — Stage E, not published
+# Distribution — 0.1.0 PRIVATE RC, not published
 
 ## Status and ownership
 
-Product0.1.0 / upstream1.1.16 remain independent. Repository remains PRIVATE. No public download, Release, tag, HACS/Beta, signing-key publication, neighbor distribution or pilot is created by this design. Public redistribution is blocked pending upstream license confirmation; see NOTICE.md.
+Product0.1.0 / upstream1.1.16 remain independent. Repository remains PRIVATE. No public download, Release, tag, HACS/Beta, signing-key publication, neighbor distribution or pilot is created by this design. License / publication authorization is USER MANAGED / OUTSIDE TECHNICAL GATE; see NOTICE.md. No legal review is performed here.
 
 ## One Candidate, two bootstrap paths
 
 An immutable Candidate packet contains the same schema2 runtime artifact, installer/launcher SDK, trusted source definitions, upstream NOTICE and build manifest. App and Terminal consume the identical packet; they cannot rebuild from moving main or select latest silently. The release-candidate-manifest records full source commit mapping, exact file inventories, SHA-256 and tested platform matrix. Internal Candidate replacement gets a distinct build ID, never overwrites the frozen packet, and invalidates affected Pilot gates. A product release version maps to one final immutable artifact; abandoned internal Candidate builds remain evidence only.
 
-## App delivery (future, not implemented publication)
+## Implemented RC delivery, not public publication
 
-After separate release authorization and license clearance, an official project-controlled HA App repository would expose a versioned helper built from the pinned source. Images must be addressed by platform-specific digest with the build/source manifest available. Initially only tested amd64 HA OS is eligible. HA-native App install/start/Ingress, shared transactional core, native config flow and explicit READY remain the flow. A hash supplied inside the same untrusted packet is integrity, not independent provenance. No private-source URL is advertised as a public installer.
+The same repository now has official HA App repository metadata and one visible App folder. The old packaging template is hidden to prevent duplicate App slugs. Supervisor actually shallow-cloned a controlled local Git equivalent, built/installed the helper and ran its existing Ingress UI in VM201. No source was pre-copied to the local App folder.
 
-## Terminal delivery (future, not implemented publication)
+The Terminal bootstrap is a standalone stdlib frontend: one full command downloads/verifies the pinned bootstrap; it verifies the frontend and immutable 0.1.0 packet, discovers Docker/HA/config/origin, presents arrow-key menus and invokes the original SDK in the selected existing HA image. It never downloads moving main.zip or upgrades host Python. Credentials stay in memory/stdin and the temporary login grant is revoked at exit.
 
-A versioned project-controlled release location should provide the complete packet, canonical checksums and a signed manifest/signature verified against a separately published trust root. The convenient path may automate download+verify+execute only after trust setup; auditable path downloads to disk first, verifies a separately obtained checksum/signature, inspects metadata, previews, then explicitly confirms. Neither path pipes an unchecked network script into a shell. No claim is made that a signing service, trust root or release host already exists.
+The ordinary default is a fixed v0.1.0 Release URL. **That Release does not exist yet.** Current actual evidence uses an explicitly permitted local equivalent, with the exact one-line command and limitations in [RC distribution verification](rc-distribution-bootstrap.md). A test source is not advertised as a public download. The pinned project command is the trust anchor; packet hashes alone are not a signature or independent provenance service. No signing system is claimed. App Docker base is version-pinned; a digest-published image/CDN distribution remains unverified, not fabricated.
 
-Actual reference execution uses Python3.14 from the fixed official HA2026.10.2 image; VM400 host Python3.13 is not used or upgraded. Container execution requires the existing config bind to appear at the same absolute host path for mapping verification, Docker CLI/socket access restricted to the one-shot maintainer process, explicit target container, compatible runtime/network, and short-lived local HA authorization. This is powerful local Docker access, not an end-user web permission. Temporary token files must be0600 in a0700 directory, excluded from Git, revoked/deleted after use. Exact platform/image/resource evidence is retained with the Pilot.
+VM400 cold-start used host Python3.13 only for the stdlib frontend and the existing official HA2026.10.2 image/Python3.14 for the frozen SDK. Container config must be a writable host bind mounted at the same absolute host path. Current tested scope is amd64 HAOS/Linux Docker. Named volumes/custom TLS/other platforms fail conservatively or remain unverified. Docker access is powerful local host access, disclosed before confirmation; unrelated containers are not operated.
 
 ## Updates and conflicts
 
@@ -28,4 +28,4 @@ Future0.1.1/0.2.0 uses semantic product version comparison plus ownership/source
 - FORWARD_ONLY_BUT_COMPATIBLE: additive semantic migration that retains legacy identity and references; code rollback does not automatically erase registry changes.
 - RECOVERY_REQUIRED: unknown/partial ownership, registry/schema mutation that cannot be proven reversible, failed restore, concurrent modification or unexpected identity churn. Stop, retain journal/baseline, recover using supported HA backup/snapshot procedures; never claim code rollback equals full HA state rollback.
 
-No release promotion until the Stage E gates and subsequent explicit release authorization. Longer real observation, license clearance, image/signature distribution infrastructure and untested platforms remain explicit release conditions.
+No release promotion until the Stage E gates and subsequent explicit release authorization. Longer real observation, production distribution infrastructure and untested platforms remain explicit boundaries. Publication authorization is user-managed and is not a technical/license gate here.
