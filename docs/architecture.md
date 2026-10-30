@@ -4,7 +4,7 @@
 
 > 历史设计/验证记录：保留当时事实。当前已公开的 v0.1.0 与安装入口以[发布状态](rc-status.md)和[使用指南](安装与使用指南.md)为准；下文旧 PRIVATE/未发布描述不代表当前状态。
 
-> 当前产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
+> 以下记录形成时的产品：NexHome 滨融府友邻加强版 0.1.0；上游基线独立为官方 v1.1.16。不是官方新版。当前入口与边界以 [README](../README.md) 和 [版本规则](product-versioning.md) 为准；下文阶段记录保留当时事实。
 
 
 Status: **Architecture / Prototype Planning**。本文为未来实现的架构提案，不是已发布产品的安装说明。
