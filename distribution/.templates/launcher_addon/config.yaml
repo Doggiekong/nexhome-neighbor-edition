@@ -1,5 +1,5 @@
 name: "NexHome 滨融府友邻加强版"
-version: "0.1.0"
+version: "0.1.1"
 slug: "nexhome_neighbor"
 description: "在自己的 Home Assistant 中安装、更新和检查 NexHome"
 arch:

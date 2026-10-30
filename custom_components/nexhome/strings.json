@@ -3,40 +3,40 @@
   "config": {
     "step": {
       "confirm": {
-        "title": "Confirm local gateway",
-        "description": "Connect the gateway at {endpoint}. No device control is performed."
+        "title": "Confirm NexHome controller",
+        "description": "Add the NexHome controller at {endpoint} to your Home Assistant."
       },
       "manual": {
-        "title": "Advanced local configuration",
+        "title": "Advanced manual configuration",
         "data": {
-          "ip_address": "IPv4 address and port",
-          "sn": "Local gateway identity"
+          "ip_address": "Controller address and port",
+          "sn": "Controller identification"
         }
       },
       "select_hub": {
-        "title": "Choose a gateway",
+        "title": "Choose a NexHome controller",
         "data": {
-          "hub": "Gateway"
+          "hub": "Controller"
         }
       },
       "no_hubs": {
-        "title": "No local gateway found",
-        "description": "Check that Home Assistant and the gateway share the same LAN. No network scan is performed.",
+        "title": "No NexHome controller found",
+        "description": "Check that Home Assistant can reach the controller on your home network, then try again.",
         "menu_options": {
-          "retry": "Retry local discovery",
+          "retry": "Search again",
           "manual": "Advanced manual configuration"
         }
       }
     },
     "error": {
-      "cannot_connect": "Cannot initialize the local gateway.",
-      "invalid_input": "Invalid local gateway parameters."
+      "cannot_connect": "Cannot connect to this NexHome controller.",
+      "invalid_input": "The controller information is not correct."
     },
     "abort": {
-      "already_configured": "This gateway is already configured.",
-      "identity_mismatch": "The discovered gateway has a different identity; existing configuration was kept.",
-      "invalid_selection": "Invalid gateway selection.",
-      "reconfigure_successful": "Local gateway connection updated."
+      "already_configured": "This NexHome controller has already been added.",
+      "identity_mismatch": "The controller found is different from the existing one. Your current configuration was kept.",
+      "invalid_selection": "The selected controller could not be confirmed. Please choose again.",
+      "reconfigure_successful": "NexHome controller connection updated."
     }
   }
 }

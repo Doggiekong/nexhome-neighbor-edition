@@ -44,7 +44,7 @@ def test_distribution_pins_are_synchronized():
     assert data['frontend_sha256'] == hashlib.sha256((ROOT / 'distribution/terminal.py').read_bytes()).hexdigest()
     assert data['bootstrap_sha256'] == hashlib.sha256((ROOT / 'distribution/start.sh').read_bytes()).hexdigest()
     assert data['frontend_sha256'] in (ROOT / 'distribution/start.sh').read_text()
-    assert data['version'] == '0.1.0'
+    assert data['version'] == '0.1.1'
     assert data['public_release_created'] is True
     assert data['release_base'] == entry.DEFAULT_SOURCE
 
@@ -248,7 +248,6 @@ def test_app_repeated_boot_does_not_add_bytecode_to_frozen_tree(tmp_path):
     source = (ROOT / 'distribution/app_entry.py').read_text()
     source = source.replace("Path('/opt/distribution/payload.tar.gz')", "Path(" + repr(str(ROOT / 'nexhome_neighbor/payload.tar.gz')) + ")")
     source = source.replace("Path('/opt/nexhome')", "Path(" + repr(str(tmp_path / 'extracted')) + ")")
-    source = source.replace("Path('/opt/distribution/public-web')", "Path(" + repr(str(tmp_path / 'public-web')) + ")")
     # Run the actual entry/extraction twice in a real fresh interpreter. Import
     # frozen SDK modules instead of starting a privileged HTTP service.
     script = """import sys, runpy, importlib
@@ -260,8 +259,8 @@ exec(compile(source, 'app_entry.py', 'exec'), {})
 assert sys.dont_write_bytecode
 from pathlib import Path
 assert not list(Path(TARGET).rglob('*.pyc'))
-assert '正式发布版本 v0.1.0' in (Path(TARGET).parent / 'public-web/index.html').read_text()
-assert '尚未向真实住户发布' in (Path(TARGET) / 'neighbor_launcher/web/index.html').read_text()
+assert '由住户社区维护，并非 NexHome 官方软件。' in (Path(TARGET) / 'neighbor_launcher/web/index.html').read_text()
+assert '尚未向真实住户发布' not in (Path(TARGET) / 'neighbor_launcher/web/index.html').read_text()
 """.replace('DIST', repr(str(ROOT / 'distribution'))).replace('SOURCE', repr(source)).replace('TARGET', repr(str(tmp_path / 'extracted')))
     for _ in range(2):
         result = subprocess.run([sys.executable, '-c', script], capture_output=True, text=True)

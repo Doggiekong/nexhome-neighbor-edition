@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
-source_url=https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.0
+source_url=https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.1
 fixture=
 protocols='=https'
 if [ "$#" -eq 2 ] && [ "$1" = --fixture-source ]; then

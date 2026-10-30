@@ -21,9 +21,9 @@ import urllib.parse
 import urllib.request
 from pathlib import Path, PurePosixPath
 
-VERSION = '0.1.0'
-DEFAULT_SOURCE = 'https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.0'
-PAYLOAD_NAME = 'nexhome-0.1.0.tar.gz'
+VERSION = '0.1.1'
+DEFAULT_SOURCE = 'https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.1'
+PAYLOAD_NAME = 'nexhome-0.1.1.tar.gz'
 PAYLOAD_SHA256 = '9c689161a068d840d1be66f88f1673fca2b5f4866a04b93237fe6b8b8679b093'
 ARTIFACT_SHA256 = 'f6102c029ee3c27f65beafc68a5cbf22639df2a3a2dc713e0131f84144e390e1'
 MAX_BYTES = 8 * 1024 * 1024
@@ -57,12 +57,12 @@ def checked_source(value, fixture=False):
         if u.scheme not in {'http', 'https'} or not (addr.is_private or addr.is_loopback):
             raise FriendlyError('测试分发源只能用于本地隔离验证。', 'FIXTURE_SOURCE_INVALID')
     elif value.rstrip('/') != DEFAULT_SOURCE:
-        raise FriendlyError('安装来源不是固定的官方项目分发入口。', 'SOURCE_NOT_PINNED')
+        raise FriendlyError('请从友邻加强版项目页面取得安装命令。', 'SOURCE_NOT_PINNED')
     return value.rstrip('/')
 
 
 def fetch_payload(source, target, *, opener=None):
-    request = urllib.request.Request(source + '/' + PAYLOAD_NAME, headers={'User-Agent': 'Nexhome-Neighbor-Bootstrap/0.1.0'})
+    request = urllib.request.Request(source + '/' + PAYLOAD_NAME, headers={'User-Agent': 'Nexhome-Neighbor-Bootstrap/0.1.1'})
     try:
         with (opener or urllib.request.build_opener(NoRedirect())).open(request, timeout=30) as response:
             raw = response.read(MAX_BYTES + 1)
@@ -97,7 +97,7 @@ def extract_payload(archive, root):
     manifest = root / 'bundle/artifact.json'
     # The SDK's Artifact.open independently verifies the deployed file manifest.
     if not manifest.is_file() or hashlib.sha256(manifest.read_bytes()).hexdigest() != ARTIFACT_SHA256:
-        raise FriendlyError('安装包的组件清单与固定版本不一致。', 'ARTIFACT_PIN_MISMATCH')
+        raise FriendlyError('安装文件检查未通过，已停止。', 'ARTIFACT_PIN_MISMATCH')
 
 
 def candidates(rows, lan_ip):
@@ -119,7 +119,7 @@ def candidates(rows, lan_ip):
             reason = '这个配置卷不是当前已验证的可写主机目录，请让本机管理员确认。'
         config = mounts[0].get('Source') if len(mounts) == 1 else None
         if config and (not Path(config).is_absolute() or any(c in config for c in ',\n\r')):
-            reason = '这个配置路径暂不能安全传给安装核心。'
+            reason = '暂时无法安全使用这个配置目录，请让本机管理员确认。'
         ports = x.get('NetworkSettings', {}).get('Ports', {}) or {}
         bindings = [(p, b) for p, values in ports.items() for b in (values or []) if p in {'80/tcp', '8123/tcp'}]
         port = None
@@ -211,10 +211,10 @@ def auth(origin):
             raw = response.read()
             return json.loads(raw) if raw else None
     with open('/dev/tty', 'r') as reader, open('/dev/tty', 'w') as terminal:
-        terminal.write('\n请输入自己的HA用户名（仅用于当前本机登录）：')
+        terminal.write('\nHome Assistant 用户名：')
         terminal.flush()
         username = reader.readline().strip()
-        password = getpass.getpass('HA密码（隐藏输入、不保存）：', stream=terminal)
+        password = getpass.getpass('Home Assistant 密码（隐藏输入）：', stream=terminal)
     try:
         first = request('/auth/login_flow', {'client_id': origin + '/', 'handler': ['homeassistant', None], 'redirect_uri': origin + '/?auth_callback=1'})
         result = request('/auth/login_flow/' + first['flow_id'], {'client_id': origin + '/', 'username': username, 'password': password})
@@ -295,14 +295,14 @@ def friendly_source(detected):
     if owner in {'MANUAL_UNKNOWN', 'OWNERSHIP_CONFLICT'}:
         raise FriendlyError('发现以前安装过NexHome，但文件与安装来源对不上。为了保留您现在的配置，这次不会覆盖。', owner)
     if detected.get('hacs_claim_count') or detected.get('hacs_schema_uncertain'):
-        raise FriendlyError('这份NexHome仍由HACS负责更新。请先由本机维护者通过HACS正常界面交接；不要删除HA里的设备条目。', 'HACS_HANDOFF_REQUIRED')
+        raise FriendlyError('这份NexHome仍由HACS负责更新。请按 HACS 提示停止由它管理这个组件；不要删除 Home Assistant 里的设备与设置。', 'HACS_HANDOFF_REQUIRED')
     if detected.get('installed'):
         return '✓ 已有NexHome ' + str(detected.get('version')) + '；升级将先备份并保留原设备、名称、房间和自动化引用。'
-    return '✓ 当前尚未安装NexHome；将安装友邻加强版0.1.0。'
+    return '✓ 当前尚未安装NexHome；将安装友邻加强版0.1.1。'
 
 
 def host(args):
-    print('\nNexHome 滨融府友邻加强版 0.1.0\n安装助手\n正在检查当前环境……', flush=True)
+    print('\nNexHome 滨融府友邻加强版 0.1.1\n安装助手\n正在检查当前环境……', flush=True)
     if platform.system() != 'Linux':
         raise FriendlyError('请在运行Home Assistant的Linux/NAS主机Terminal中执行；这里不是已验证环境。', 'PLATFORM_UNSUPPORTED')
     source = checked_source(args.source, args.fixture)
@@ -330,17 +330,17 @@ def host(args):
         chosen['connect_url'] = 'http://127.0.0.1:' + str(data['port'])
         chosen['browser_url'] = 'http://' + ip + ':' + str(data['port'])
     print('✓ 自动找到配置目录和网页地址（无需手填）', flush=True)
-    if choose('需要本机Docker和所选HA配置权限；不会操作其他容器。', ['继续检查固定安装包', '退出']) != 0:
+    if choose('需要本机 Docker 和所选 Home Assistant 的配置权限；不会操作其他容器。', ['继续检查安装文件', '退出']) != 0:
         return 0
     with tempfile.TemporaryDirectory(prefix='nexhome-bootstrap-') as tmp:
         directory = Path(tmp)
         archive = fetch_payload(source, directory / PAYLOAD_NAME)
         extract_payload(archive, directory / 'package')
         shutil.copyfile(__file__, directory / 'terminal.py')
-        print('✓ 固定0.1.0安装包及组件清单校验通过', flush=True)
+        print('✓ 安装文件检查通过', flush=True)
         detected = run_worker(chosen, directory, 'inspect')['detected']
         print(friendly_source(detected), flush=True)
-        print('请只在当前本机输入自己的HA账号；仅当前会话使用，结束后撤销授权。', flush=True)
+        print('请登录自己的 Home Assistant。账号和密码只用于当前安装过程，不会上传到项目。', flush=True)
         tokens, revoke = auth(chosen['connect_url'])
         try:
             preview = run_worker(chosen, directory, 'preview', tokens['access_token'])
@@ -361,24 +361,24 @@ def host(args):
                 result = run_worker(chosen, directory, 'deploy', tokens['access_token'], preview['fingerprint'])
                 if result['code'] != 0:
                     raise FriendlyError('安装尚未完成，请保留当前状态和备份，不要删除重建。', 'CORE_DEPLOYMENT_NOT_COMPLETED')
-            print('✓ 组件部署已确认；已有配置会沿用。', flush=True)
+            print('✓ 友邻加强版已经安装，已有配置会继续使用。', flush=True)
             print('请在浏览器打开：' + chosen['browser_url'] + '/config/integrations/integration/nexhome', flush=True)
             native = result.get('native_url') or '/config/integrations/integration/nexhome'
             if not native.startswith('/config/integrations/'):
-                raise FriendlyError('安装核心没有返回可确认的HA连接入口，请保留现状。', 'NATIVE_ENTRY_UNCONFIRMED')
-            print('HA原生连接入口：' + chosen['browser_url'] + native, flush=True)
+                raise FriendlyError('暂时无法打开 Home Assistant 的连接页面，请保留现状，查看技术详情。', 'NATIVE_ENTRY_UNCONFIRMED')
+            print('请打开 Home Assistant 继续连接 NexHome：' + chosen['browser_url'] + native, flush=True)
             while True:
-                action = choose('回到HA完成原生连接，看到设备，操作一盏灯并核对真实状态。', ['已找到设备并完成首次操作，检查READY', '查看技术详情', '稍后继续，安全退出'])
+                action = choose('回到 Home Assistant 连接 NexHome，找到一盏灯试一次控制，并核对实际动作和页面状态。', ['已找到设备并完成首次操作，检查是否完成', '查看技术详情', '稍后继续，安全退出'])
                 if action == 2:
                     return 0
                 result = run_worker(chosen, directory, 'verify', tokens['access_token'])
                 if action == 1:
                     print(json.dumps(result['details'], ensure_ascii=False), flush=True)
                 elif result['screen'] == 'ready':
-                    print('✓ 安装与首次使用已完成：READY。终端可以关闭。', flush=True)
+                    print('✓ 安装完成，设备已经可以正常使用。现在可以关闭终端。', flush=True)
                     return 0
                 else:
-                    print('尚未取得完整的真实控制读回证据，不会提前标记完成。', flush=True)
+                    print('还没有确认设备可以正常控制，请先操作一盏灯并检查 Home Assistant 状态。', flush=True)
         finally:
             try:
                 revoke()
@@ -402,7 +402,7 @@ def main():
                 print(json.dumps(worker(args), ensure_ascii=False))
             except Exception as error:
                 code = str(error) if re_safe_code(str(error)) else type(error).__name__
-                print(json.dumps({'error': code, 'message': '安装核心未确认安全条件；请保留现状，查看技术详情。'}))
+                print(json.dumps({'error': code, 'message': '暂时无法确认安装条件，请保留现状，查看技术详情。'}))
             return 0
         return host(args)
     except FriendlyError as error:
@@ -414,7 +414,7 @@ def main():
             pass
         return 2
     except KeyboardInterrupt:
-        print('\n已退出。若部署进行中被中断，请保留备份并先检查恢复状态。', flush=True)
+        print('\n已退出。若安装进行中被中断，请保留备份并先检查恢复状态。', flush=True)
         return 130
     except Exception:
         print('\n当前环境不能安全继续。未显示密码或异常堆栈，请保留现状让本机维护者检查。', flush=True)

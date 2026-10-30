@@ -14,7 +14,7 @@ Artifact schema2 记录上述四字段，version 保留为 product_version 的�
 
 已验证 NEIGHBOR_INSTALLER 的历史 schema1 dev1–dev4 → schema2 独立产品是显式 lineage transition；不使用数值降级判断。仅依赖版本字符串、MANUAL_UNKNOWN、其他未知内部版本均不足以跨 lineage。新产品之间按 packaging.version 比较；同文件 NO_OP，同版本不同文件拒绝覆盖，降级拒绝。新产品→旧 schema1 target 拒绝；显式 transaction rollback 仍按原备份恢复。
 
-HACS 自身可能按标签进行版本排序；未来正式渠道必须显式切换并清除旧源更新责任，不能把同一旧源标签序列直接递增或假设 HACS 会自动接受 0.1.0。当前正式 Release/tag 为 v0.1.0；HACS 发布仍未进行。HACS owner分类依据 source/tree/证据，不取决于版本数值。
+HACS 自身可能按标签进行版本排序；未来正式渠道必须显式切换并清除旧源更新责任，不能把同一旧源标签序列直接递增或假设 HACS 会自动接受 0.1.0。当前正式 Release/tag 为 v0.1.1；HACS 发布仍未进行。HACS owner分类依据 source/tree/证据，不取决于版本数值。
 
 ## 显示与诊断
 

@@ -1,7 +1,7 @@
 """Wire constants and conservative candidate defaults."""
 
 DOMAIN = "nexhome"
-PRODUCT_VERSION = "0.1.0"
+PRODUCT_VERSION = "0.1.1"
 UPSTREAM_BASE_VERSION = "1.1.16"
 PRODUCT_ID = "nexhome-neighbor-edition"
 VERSION = PRODUCT_VERSION

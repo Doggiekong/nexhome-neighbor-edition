@@ -45,7 +45,7 @@ class NexhomeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except ValueError, TypeError, IndexError, KeyError:
                 return self.async_abort(reason="invalid_selection")
             return await self.async_step_confirm()
-        choices = {str(i): f"Hub {i + 1} — {hub.endpoint}" for i, hub in enumerate(self.hubs)}
+        choices = {str(i): f"中控 {i + 1} — {hub.endpoint}" for i, hub in enumerate(self.hubs)}
         return self.async_show_form(
             step_id="select_hub", data_schema=vol.Schema({vol.Required("hub"): vol.In(choices)})
         )

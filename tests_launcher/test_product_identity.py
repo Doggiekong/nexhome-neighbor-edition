@@ -32,7 +32,7 @@ def test_explicit_legacy_upgrade_and_noop(tmp_path, legacy):
     new = product(tmp_path)
     ui = Controller(engine, new, tmp_path / 'ui')
     assert step(ui, 'check')['screen'] == 'update'
-    assert ui.view()['current_version'] == '早期内部 Candidate'
+    assert ui.view()['current_version'] == '早期版本'
     assert install(ui)['screen'] == 'installed'
     assert engine.inspect()['product_version'] == '0.1.0'
     assert engine.inspect()['upstream_base_version'] == '1.1.16'
@@ -106,7 +106,7 @@ def test_source_identity_and_history_are_separate():
     root=Path(__file__).resolve().parents[1]
     manifest=load(root/'custom_components/nexhome/manifest.json')
     info=load(root/'custom_components/nexhome/product.json')
-    assert manifest['version']==info['product_version']=='0.1.0'
+    assert manifest['version']==info['product_version']=='0.1.1'
     assert info['upstream_base_version']=='1.1.16'
     assert '1.1.17.dev4' not in (root/'neighbor_launcher/web/index.html').read_text()
     assert '1.1.17.dev4' in (root/'docs/phase2-staged-validation.md').read_text()

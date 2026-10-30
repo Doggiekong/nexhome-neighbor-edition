@@ -56,7 +56,7 @@ def _deploy(controller, *, confirm=False, handoff=False, output=print):
 
 
 def _finish(controller, view, output):
-    output("组件已部署，尚需在 Home Assistant 完成连接与首次操作。")
+    output("友邻加强版已经安装，请在 Home Assistant 连接 NexHome 并试一次控制。")
     origin = getattr(controller.engine.lifecycle, '_ha_url', '').rstrip('/')
     output(origin + view['native_url'])
     output("已有配置会沿用；选择一盏灯操作并核对状态后，才算完成首次使用。")
@@ -90,7 +90,7 @@ def verify_completion(controller, *, output=print):
             output("尚未确认连接，请保留现状并检查 Home Assistant。")
             return 2
     if controller.view()['completion'].get('stage') != 'CONTROL_VERIFIED':
-        output("设备可见和首次控制读回尚未全部确认，不标记安装完成。")
+        output("还没有确认设备可以正常控制，请先在 Home Assistant 操作一盏灯并检查状态。")
         return 2
     if controller.view()['screen']=='ready':
         output(controller.view()['title'])

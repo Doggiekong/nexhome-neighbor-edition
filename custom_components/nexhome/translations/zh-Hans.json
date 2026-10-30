@@ -3,40 +3,40 @@
   "config": {
     "step": {
       "confirm": {
-        "title": "确认本地中控",
-        "description": "正在将本地中控 {endpoint} 接入您自己的 Home Assistant。本步骤不控制设备。"
+        "title": "确认 NexHome 中控",
+        "description": "将 {endpoint} 的 NexHome 中控添加到自己的 Home Assistant。"
       },
       "manual": {
-        "title": "Advanced local configuration",
+        "title": "高级手动配置",
         "data": {
-          "ip_address": "IPv4 address and port",
-          "sn": "Local gateway identity"
+          "ip_address": "中控地址和端口",
+          "sn": "中控识别信息"
         }
       },
       "select_hub": {
-        "title": "Choose a gateway",
+        "title": "选择 NexHome 中控",
         "data": {
-          "hub": "Gateway"
+          "hub": "中控"
         }
       },
       "no_hubs": {
-        "title": "未找到本地中控",
-        "description": "请确认 HA 与中控在同一局域网。不会扫描家庭主机。",
+        "title": "未找到 NexHome 中控",
+        "description": "请确认 Home Assistant 与中控在同一可通信的家庭网络，然后重试。",
         "menu_options": {
           "retry": "重新查找",
-          "manual": "高级手工配置"
+          "manual": "高级手动配置"
         }
       }
     },
     "error": {
-      "cannot_connect": "Cannot initialize the local gateway.",
-      "invalid_input": "Invalid local gateway parameters."
+      "cannot_connect": "无法连接到这个 NexHome 中控。",
+      "invalid_input": "中控信息不正确。"
     },
     "abort": {
-      "already_configured": "This gateway is already configured.",
-      "identity_mismatch": "The discovered gateway has a different identity; existing configuration was kept.",
-      "invalid_selection": "Invalid gateway selection.",
-      "reconfigure_successful": "Local gateway connection updated."
+      "already_configured": "这个 NexHome 中控已经添加过了。",
+      "identity_mismatch": "找到的中控与原来不同，已保留原有配置。请确认是否选择了自己的中控。",
+      "invalid_selection": "未能确认所选中控，请重新选择。",
+      "reconfigure_successful": "NexHome 中控连接已更新。"
     }
   }
 }

@@ -87,7 +87,7 @@ class Controller:
                 'steps': [PHASE_LABELS[x] for x in self.state.get('steps', []) if x in PHASE_LABELS],
                 'product_version': self.artifact.metadata.get('product_version', self.artifact.metadata['version']),
                 'upstream_base_version': self.artifact.metadata.get('upstream_base_version'),
-                'current_version': ('早期内部 Candidate' if detected.get('version') in {'1.1.17.dev1', '1.1.17.dev2', '1.1.17.dev3', '1.1.17.dev4'} else detected.get('version')),
+                'current_version': ('早期版本' if detected.get('version') in {'1.1.17.dev1', '1.1.17.dev2', '1.1.17.dev3', '1.1.17.dev4'} else detected.get('version')),
                 'new_version': self.artifact.metadata['version'],
                 'plan': self.plan['id'] if self.plan else None,
                 'handoff_note': self.state.get('handoff_note'),

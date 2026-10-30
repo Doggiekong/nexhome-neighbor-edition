@@ -21,7 +21,7 @@ def assemble(root):
     text = shell.read_text(encoding='utf-8')
     text = re.sub(r"echo '[a-f0-9]{64}  '", "echo '" + runner + "  '", text)
     shell.write_text(text, encoding='utf-8', newline='\n')
-    lock = {'version': '0.1.0', 'artifact_archive_sha256': PAYLOAD_SHA256,
+    lock = {'version': '0.1.1', 'artifact_archive_sha256': PAYLOAD_SHA256,
             'artifact_manifest_sha256': ARTIFACT_SHA256,
             'runtime_source_commit': 'c9246a1bce8fa087f2b590667d683fa1f47d4964',
             'frontend_sha256': runner,
