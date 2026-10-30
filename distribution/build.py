@@ -23,7 +23,7 @@ def assemble(root):
     shell.write_text(text, encoding='utf-8', newline='\n')
     lock = {'version': '0.1.1', 'artifact_archive_sha256': PAYLOAD_SHA256,
             'artifact_manifest_sha256': ARTIFACT_SHA256,
-            'runtime_source_commit': 'c9246a1bce8fa087f2b590667d683fa1f47d4964',
+            'runtime_source_commit': 'dffa455d759a5c88d37cbcf4866d8fe131c17c6c',
             'frontend_sha256': runner,
             'bootstrap_sha256': hashlib.sha256(shell.read_bytes()).hexdigest(),
             'release_base': DEFAULT_SOURCE, 'public_release_created': True}

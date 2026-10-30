@@ -16,5 +16,5 @@ command -v curl >/dev/null || { echo '当前终端没有curl，请让本机管�
 work=$(mktemp -d)
 trap 'rm -f "$work/terminal.py"; rmdir "$work"' EXIT HUP INT TERM
 curl -fsSL --proto "$protocols" --proto-redir '=https' --max-redirs 3 --connect-timeout 10 --max-time 60 "$source_url/terminal.py" -o "$work/terminal.py"
-echo '1445ccae9faf1ed01ded39822e94c096dff6eae7a087f152c581bde23a2d878e  '"$work/terminal.py" | sha256sum -c - >/dev/null || { echo '启动器校验不一致，停止。'; exit 2; }
+echo 'c0a75314915f455f3d1bdc4d4bf83b59c17691321218466b8c530eaf697a5302  '"$work/terminal.py" | sha256sum -c - >/dev/null || { echo '启动器校验不一致，停止。'; exit 2; }
 python3 "$work/terminal.py" --source "$source_url" $fixture

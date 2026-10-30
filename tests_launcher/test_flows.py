@@ -53,7 +53,7 @@ def test_d2_latest(lab):
     runtime.calls.clear()
     view = step(ui, 'check')
     assert view['screen'] == 'installed'
-    assert '组件已部署' in view['title']
+    assert '友邻加强版已经安装' in view['title']
     assert runtime.calls == []
 
 
@@ -63,7 +63,7 @@ def test_d3_update(lab, tmp_path):
     ui.artifact = artifact(tmp_path, '1.1.17.dev4')
     view = step(ui, 'check')
     assert view['screen'] == 'update'
-    assert view['current_version'] == '早期内部 Candidate'
+    assert view['current_version'] == '早期版本'
     assert view['new_version'] == '1.1.17.dev4'
     assert install(ui)['screen'] == 'installed'
     assert engine.inspect()['version'] == '1.1.17.dev4'

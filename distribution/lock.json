@@ -1,10 +1,10 @@
 {
-  "version": "0.1.0",
-  "artifact_archive_sha256": "9c689161a068d840d1be66f88f1673fca2b5f4866a04b93237fe6b8b8679b093",
-  "artifact_manifest_sha256": "f6102c029ee3c27f65beafc68a5cbf22639df2a3a2dc713e0131f84144e390e1",
-  "runtime_source_commit": "c9246a1bce8fa087f2b590667d683fa1f47d4964",
-  "frontend_sha256": "1445ccae9faf1ed01ded39822e94c096dff6eae7a087f152c581bde23a2d878e",
-  "bootstrap_sha256": "9ee729ad1672753ed9a8f2626b3461eecba89d80116f8af43a0c1c80f4402e16",
-  "release_base": "https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.0",
+  "version": "0.1.1",
+  "artifact_archive_sha256": "ff2777cf5f63299ccdc1bc32813c11c86abc76490a6e15124f00de8368662551",
+  "artifact_manifest_sha256": "ccf44ec18399721599baa3c810e9e94278d1013ccd9b5be8d79fb18f8d4ab958",
+  "runtime_source_commit": "dffa455d759a5c88d37cbcf4866d8fe131c17c6c",
+  "frontend_sha256": "c0a75314915f455f3d1bdc4d4bf83b59c17691321218466b8c530eaf697a5302",
+  "bootstrap_sha256": "19bceabdda0622600fde4a4387e818fbb4140c20b89db2e9ef4916aad6502a79",
+  "release_base": "https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.1",
   "public_release_created": true
 }

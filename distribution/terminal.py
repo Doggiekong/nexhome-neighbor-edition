@@ -24,8 +24,8 @@ from pathlib import Path, PurePosixPath
 VERSION = '0.1.1'
 DEFAULT_SOURCE = 'https://github.com/Doggiekong/nexhome-neighbor-edition/releases/download/v0.1.1'
 PAYLOAD_NAME = 'nexhome-0.1.1.tar.gz'
-PAYLOAD_SHA256 = '9c689161a068d840d1be66f88f1673fca2b5f4866a04b93237fe6b8b8679b093'
-ARTIFACT_SHA256 = 'f6102c029ee3c27f65beafc68a5cbf22639df2a3a2dc713e0131f84144e390e1'
+PAYLOAD_SHA256 = 'ff2777cf5f63299ccdc1bc32813c11c86abc76490a6e15124f00de8368662551'
+ARTIFACT_SHA256 = 'ccf44ec18399721599baa3c810e9e94278d1013ccd9b5be8d79fb18f8d4ab958'
 MAX_BYTES = 8 * 1024 * 1024
 
 
