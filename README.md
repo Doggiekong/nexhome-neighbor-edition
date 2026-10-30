@@ -24,17 +24,25 @@
 
 ## 开始安装
 
-**两种安装方式只需要选择一种。** 安装前建议先保留一次 Home Assistant 备份，并准备自己的管理员账号。
+**先确认自己使用的是哪一种 Home Assistant 安装方式。**
+
+不知道的话，先看：**[如何查看 Home Assistant 安装类型](docs/安装与使用指南.md#choose-route)**。
+
+确认以后，只选择下面一种安装方式。安装前建议先保留一次 Home Assistant 备份，并准备自己的管理员账号。
 
 ### Home Assistant OS
 
-**[添加到 Home Assistant](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FDoggiekong%2Fnexhome-neighbor-edition)** → [详细教程](docs/安装与使用指南.md#route-a)
+<a href="https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FDoggiekong%2Fnexhome-neighbor-edition" target="_blank" rel="noopener noreferrer"><img src="https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg" alt="添加到 Home Assistant"></a>
+
+**建议右键“添加到 Home Assistant”，选择“在新标签页中打开”，这样可以保留本指南，方便安装过程中随时回来查看。**
+
+[查看 Home Assistant OS 详细教程](docs/安装与使用指南.md#route-a)
 
 ### NAS / Docker / Container / Linux
 
-**[Terminal 安装](docs/安装与使用指南.md#route-b)** → 复制完整一行，跟着菜单完成安装。
+**[Terminal 安装](docs/安装与使用指南.md#route-b)** → 复制完整一行命令，按安装助手提示操作。
 
-不确定自己是哪一种？先看指南里的[安装类型](docs/安装与使用指南.md#choose-route)。手机端使用官方 Home Assistant App。
+手机端使用官方 Home Assistant App。
 
 ## 安全与隐私
 
