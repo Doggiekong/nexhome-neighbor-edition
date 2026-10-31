@@ -32,18 +32,13 @@
 
 安装前建议先保留一次 Home Assistant 备份，并准备自己的管理员账号。
 
-| **A · Home Assistant OS** |
+| **A. Home Assistant OS** |
 | --- |
-| 适合使用 Home Assistant OS 的用户。 |
-| <a href="https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FDoggiekong%2Fnexhome-neighbor-edition" target="_blank" rel="noopener noreferrer"><img src="https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg" alt="添加到 Home Assistant"></a> |
-| **建议右键上方蓝色按钮，选择“在新标签页中打开”，这样可以保留本指南，方便安装过程中随时回来查看。** |
-| [查看 Home Assistant OS 详细教程](docs/安装与使用指南.md#route-a) |
+| 适合使用 Home Assistant OS 的用户。<br><br><a href="https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FDoggiekong%2Fnexhome-neighbor-edition" target="_blank" rel="noopener noreferrer"><img src="https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg" alt="添加到 Home Assistant"></a><br><br>**建议右键上方蓝色按钮，选择“在新标签页中打开”，这样可以保留本指南，方便安装过程中随时回来查看。**<br><br>[查看 Home Assistant OS 详细教程](docs/安装与使用指南.md#route-a) |
 
-| **B · NAS / Docker / Container / Linux** |
+| **B. NAS / Docker / Container / Linux** |
 | --- |
-| 适合通过 NAS / Docker / Container / Linux 运行 Home Assistant 的用户。 |
-| **[Terminal 安装](docs/安装与使用指南.md#route-b)** → 复制完整一行命令，按安装助手提示操作。 |
-| [查看 Terminal 详细教程](docs/安装与使用指南.md#route-b) |
+| 适合通过 NAS / Docker / Container / Linux 运行 Home Assistant 的用户。<br><br>**[Terminal 安装](docs/安装与使用指南.md#route-b)** → 复制完整一行命令，按安装助手提示操作。<br><br>[查看 Terminal 详细教程](docs/安装与使用指南.md#route-b) |
 
 手机端使用官方 Home Assistant App。
 
